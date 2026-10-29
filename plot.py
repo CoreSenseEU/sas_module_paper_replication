@@ -164,7 +164,7 @@ def plot_bag(bag_path, req_names, title, min_person_gap=1.0):
                 bbox={"facecolor": "white", "alpha": 0.90, "edgecolor": "none", "pad": 1})
 
     ax.set_xlabel("Time since bag start (s)")
-    ax.set_ylabel("Satisfaction")
+    ax.set_ylabel("Satisfaction degree")
     ax.set_title(title)
     handles, labels = ax.get_legend_handles_labels()
     legend_ax.legend(handles, labels, loc="upper left", frameon=False)
