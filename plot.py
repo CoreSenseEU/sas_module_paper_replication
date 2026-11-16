@@ -10,9 +10,9 @@ import pandas as pd
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typedb_tactics.fuzzy.fuzzy_expressions import Proposition, Expression, FuzzyAnd, FuzzyOr, FuzzyNot
-from typedb_tactics.fuzzy.fuzzy_sets import FuzzyTriangular
-from typedb_tactics.fuzzy.relaxed_requirements import AsCloseAsPossibleExpression, ShallExpression
+from tactical_retreat_kb.fuzzy.fuzzy_expressions import Proposition, Expression, FuzzyAnd, FuzzyOr, FuzzyNot
+from tactical_retreat_kb.fuzzy.fuzzy_sets import FuzzyTriangular
+from tactical_retreat_kb.fuzzy.relaxed_requirements import AsCloseAsPossibleExpression, ShallExpression
 
 
 def just_this_requirement(req_list, req_name):
