@@ -1,0 +1,42 @@
+{
+  "name": "replication_container",
+  "build": {
+    "dockerfile": "Dockerfile",
+        "args": {
+          "USER": "${localEnv:USER}",
+          "ROS_DISTRO": "jazzy"
+        }
+  },
+  "onCreateCommand": "bash .devcontainer/setup.sh",
+  "workspaceMount": "source=${localWorkspaceFolder}/,target=/workspace,type=bind",
+  "workspaceFolder": "/workspace/.",
+  "runArgs": [
+    // needed for access to Direct Rendering hierarchy
+    "--device=/dev/dri"
+  ],
+  "mounts": [
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.Xauthority,target=/tmp/.Xauthority,type=bind"
+  ],
+  "containerEnv": {
+      "DISPLAY": "${localEnv:DISPLAY}",
+      "XAUTHORITY": "/tmp/.Xauthority"
+    },
+  "features": {
+    "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+      // comma separated list of apt packages to install in the devcontainer 
+      "packages": "openjdk-21-jdk,libgraphicsmagick++-q16-12,python3-pip, git"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.cwd": "/workspace", //updated to reflect workspace
+        "workbench.colorTheme": "Monokai" //change theme to differentiate between container/not container
+      },
+      "extensions": [
+        "mhutchie.git-graph",
+      ]
+    }
+  }
+}
