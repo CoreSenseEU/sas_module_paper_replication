@@ -2,6 +2,7 @@
   "name": "replication_container",
   "build": {
     "dockerfile": "Dockerfile",
+    "context": "..",
         "args": {
           "USER": "${localEnv:USER}",
           "ROS_DISTRO": "jazzy"

@@ -15,6 +15,29 @@ git clone git@github.com:CoreSenseEU/sas_module_paper_replication.git
 If you already cloned without it, run `git lfs install && git lfs pull` inside the repository.
 Alternatively, download the zip directly from the GitHub web interface.
 
+## Setup
+
+Use Python 3.10 or newer. From the repository directory:
+
+```Bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements
+```
+
+Alternatively, rebuild/reopen the development container in VS Code to install
+the dependencies for all plotting scripts.
+
+To build and run the container directly, from the repository directory:
+
+```Bash
+docker build -t sas_replication:latest -f .devcontainer/Dockerfile .
+docker run --rm -it --user "$(id -u):$(id -g)" \
+  -v "$PWD:/workspace" -w /workspace sas_replication:latest bash
+```
+
+Run the plotting commands below inside the container.
+
 ## Quality Inspection Testbed - Real World Evaluation
 
 There are two python scripts, plot.py and plot_cbr.py.
@@ -59,55 +82,41 @@ unzip results/suave-tactical-submission.zip -d results/suave/
 The plots and tables used in the paper are already in `campaign_results/`, so
 the steps below are only needed to regenerate them.
 
-### Regenerating the plots
+### Regenerating the representative-run figure
 
-The scripts read ROS 2 bags and use SUAVE's packages, so run them inside the
-SUAVE Docker image `ghcr.io/kas-lab/suave-headless:main`. The scripts can be
-found in [`suave_requirements/scripts`](https://github.com/kas-lab/suave/tree/main/suave_requirements/scripts),
-and their README explains the requirements and the method in detail.
-`export_representative_run_tikz.py` in this repository is a copy kept for
-reference.
-
-The commands below mount the extracted results at
-`/home/ubuntu-user/suave_results` in the container, which starts in the SUAVE
-workspace with it already sourced.
+`export_representative_run_tikz.py` runs without ROS or SUAVE packages:
 
 ```Bash
-docker pull ghcr.io/kas-lab/suave-headless:main
-
-# Fulfillment of each requirement, compared across managers
-docker run --rm \
-  --mount type=bind,src=$PWD/results/suave,dst=/home/ubuntu-user/suave_results \
-  ghcr.io/kas-lab/suave-headless:main \
-  python3 src/suave/suave_requirements/scripts/plot_requirement_fulfillment.py \
-  /home/ubuntu-user/suave_results/batch_20261012_192250
-
-# Representative TacticalRetreat run (the paper figure)
-docker run --rm \
-  --mount type=bind,src=$PWD/results/suave,dst=/home/ubuntu-user/suave_results \
-  ghcr.io/kas-lab/suave-headless:main \
-  python3 src/suave/suave_requirements/scripts/export_representative_run_tikz.py \
-  --manager "rebetmc" /home/ubuntu-user/suave_results/batch_20261012_192250
+python3 export_representative_run_tikz.py \
+  results/suave/batch_20261012_192250 \
+  --output-dir results/suave/regenerated
 ```
-
-The container runs as a user with UID 1000. If your user has a different
-UID, make `$HOME/suave_results` writable for it, or the scripts cannot save
-their outputs. The outputs replace the ones shipped in the zip. Add
-`--output-dir /home/ubuntu-user/suave_results/<dir>` after the batch path to
-keep both.
 
 `export_representative_run_tikz.py` picks the run closest to the median of
 search time, distance inspected and mean reaction time, which is `run_0_9`
 for this batch. `--run-id` chooses another run. `--xmax` shortens the
 figure's x axis and `--no-water-visibility` leaves out the water-visibility
 panel. Outputs go to
-`$HOME/suave_results/batch_20261012_192250/campaign_results/exp3/`, or to
-`--output-dir`. Pass `--help` instead of the batch path to see all of a
-script's options.
+`results/suave/regenerated/exp3/rebetmc_run_0_9/` with the command above.
+Without `--output-dir`, they go to the batch's
+`campaign_results/exp3/representative_run/rebetmc_run_0_9/`, replacing files
+with the same names. Pass `--help` instead of the batch path to see all of
+a script's options.
 
 ### Compiling the figures
 
-The SUAVE containers do not include LaTeX, so `--compile` is skipped there.
-To compile a figure, run `pdflatex` on its `.tex` file on a machine with
-LaTeX installed, including `pgfplots` and the `standalone` class (on Ubuntu,
-`texlive-latex-extra`).
+The previous command, only generates `.tex` files. To actually generate a `.pdf` with the figure, you need to install latex and some latex utils.
+
+In ubuntu/debian:
+
+```bash
+sudo apt install texlive-latex-extra texlive-pictures poppler-utils
+```
+
+With these dependencies installed, you can compile the `.tex` files and generate a PDF by passing the `--compile` flag:
+
+```Bash
+python3 export_representative_run_tikz.py  --compile \
+  results/suave/batch_20261012_192250 \
+  --output-dir results/suave/regenerated
+```

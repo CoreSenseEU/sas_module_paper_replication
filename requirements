@@ -1,0 +1,8 @@
+# Dependencies for all plotting scripts (Python 3.10+).
+numpy>=1.26,<3
+PyYAML==6.0.3
+rosbags==0.11.3
+pandas
+matplotlib
+Jinja2
+git+https://github.com/kas-lab/tactical_retreat_kb.git

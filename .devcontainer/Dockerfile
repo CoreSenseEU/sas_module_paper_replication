@@ -1,4 +1,4 @@
-ARG USER
+ARG USER=developer
 ARG USER_UID=1000
 ARG USER_GID=1000
 ARG ROS_DISTRO=jazzy
@@ -19,6 +19,12 @@ RUN groupadd --gid $USER_GID $USER \
     && apt-get update && apt-get install -y \
         bash-completion \
         openssh-client \
+        git \
+        python3-pip \
+        python3-venv \
+        texlive-latex-extra \
+        texlive-pictures \
+        poppler-utils \
         sudo \
     && rm -rf /var/lib/apt/lists/* \
     && rm /etc/apt/apt.conf.d/docker-clean \
@@ -27,6 +33,12 @@ RUN groupadd --gid $USER_GID $USER \
     && chown -R $USER /root/ \
     && echo "source /opt/ros/jazzy/setup.bash" >> /home/${USER}/.bashrc
 
+
+COPY requirements /tmp/requirements
+RUN python3 -m venv /opt/replication-venv \
+    && /opt/replication-venv/bin/pip install --no-cache-dir -r /tmp/requirements \
+    && chown -R ${USER_UID}:${USER_GID} /opt/replication-venv
+ENV PATH="/opt/replication-venv/bin:${PATH}"
 
 # Set the user as the default user
 USER $USER
