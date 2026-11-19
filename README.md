@@ -50,10 +50,10 @@ compares `TacticalRetreat` with SUAVE's other managing systems.
 | `campaign_results/exp3/requirement_fulfillment/` | Fulfillment of each requirement over time, compared across managers |
 | `campaign_results/exp3/representative_run/rebetmc_run_0_9/` | Representative `TacticalRetreat` run: PGFPlots tables, `representative_run.tex` and `.pdf` |
 
-Extract it with:
+From this repository directory, extract the data with:
 
 ```Bash
-unzip results/suave-tactical-submission.zip -d $HOME/suave_results/
+unzip results/suave-tactical-submission.zip -d results/suave/
 ```
 
 The plots and tables used in the paper are already in `campaign_results/`, so
@@ -77,17 +77,17 @@ docker pull ghcr.io/kas-lab/suave-headless:main
 
 # Fulfillment of each requirement, compared across managers
 docker run --rm \
-  --mount type=bind,src=$HOME/suave_results,dst=/home/ubuntu-user/suave_results \
+  --mount type=bind,src=$PWD/results/suave,dst=/home/ubuntu-user/suave_results \
   ghcr.io/kas-lab/suave-headless:main \
   python3 src/suave/suave_requirements/scripts/plot_requirement_fulfillment.py \
   /home/ubuntu-user/suave_results/batch_20261012_192250
 
 # Representative TacticalRetreat run (the paper figure)
 docker run --rm \
-  --mount type=bind,src=$HOME/suave_results,dst=/home/ubuntu-user/suave_results \
+  --mount type=bind,src=$PWD/results/suave,dst=/home/ubuntu-user/suave_results \
   ghcr.io/kas-lab/suave-headless:main \
   python3 src/suave/suave_requirements/scripts/export_representative_run_tikz.py \
-  /home/ubuntu-user/suave_results/batch_20261012_192250
+  --manager "rebetmc" /home/ubuntu-user/suave_results/batch_20261012_192250
 ```
 
 The container runs as a user with UID 1000. If your user has a different
