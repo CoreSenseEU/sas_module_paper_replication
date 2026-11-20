@@ -1,0 +1,22 @@
+bond:
+  msgs:
+    Status
+      message
+       "std_msgs/msg/Header" header
+       string id # ID of the bond
+       string instance_id # Unique ID for an individual in a bond
+       bool active
+       
+       # Including the timeouts for the bond makes it easier to debug mis-matches
+       # between the two sides.
+       float32 heartbeat_timeout
+       float32 heartbeat_period
+    Constants
+      message
+       float32 DEAD_PUBLISH_PERIOD="0.05"
+       float32 DEFAULT_CONNECT_TIMEOUT="10.0"
+       float32 DEFAULT_HEARTBEAT_TIMEOUT="4.0"
+       float32 DEFAULT_DISCONNECT_TIMEOUT="2.0"
+       float32 DEFAULT_HEARTBEAT_PERIOD="1.0"
+       
+       string "DISABLE_HEARTBEAT_TIMEOUT_PARAM=/msg/bond_disable_heartbeat_timeout"

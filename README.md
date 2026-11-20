@@ -26,7 +26,7 @@ pip install -r requirements
 ```
 
 Alternatively, rebuild/reopen the development container in VS Code to install
-the dependencies for all plotting scripts.
+the dependencies for all plotting scripts. You can simply open VS Code in the root of the repository (where .devcontainer) lives, and use the dev container (see https://code.visualstudio.com/docs/devcontainers/containers).
 
 To build and run the container directly, from the repository directory:
 
@@ -48,9 +48,9 @@ plot_cbr.py is for the specific rear LiDAR failure scenario, where the robot onl
 Both scripts work about the same, they expect you to provide a directory within whichs are other directories each containing a ros bag.
 Plots and a couple of tables, one averaging and one per run are then produced in that root folder.
 
-You would plot the results of the baseline for eval1 as follows:
+You would plot the results of the baseline for Evaluation 1 as follows:
 ```
-python3 plot.py 
+python3 plot.py results/eval1-baseline/
 ```
 
 ## SUAVE - Simulated Evaluation
@@ -120,3 +120,6 @@ python3 export_representative_run_tikz.py  --compile \
   results/suave/batch_20261012_192250 \
   --output-dir results/suave/regenerated
 ```
+
+## XText Entries
+We provide the XText entries for the evaluation in the models folder.

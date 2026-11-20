@@ -1,0 +1,176 @@
+realsense2_camera_msgs:
+  msgs:
+    Metadata
+      message
+       "std_msgs/msg/Header" header
+       string json_data
+    RGBD
+      message
+       # RGBD Message
+       "std_msgs/msg/Header" header
+       "sensor_msgs/msg/CameraInfo" rgb_camera_info
+       "sensor_msgs/msg/CameraInfo" depth_camera_info
+       "sensor_msgs/msg/Image" rgb
+       "sensor_msgs/msg/Image" depth
+    Extrinsics
+      message
+       # Cross-stream extrinsics: encodes the topology describing how the different devices are oriented
+       float64[] rotation # Column - major 3x3 rotation matrix
+       float64[] translation # Three-element translation vector, in meters
+    IMUInfo
+      message
+       # header.frame_id is either set to "imu_accel" or "imu_gyro"
+       # to distinguish between "accel" and "gyro" info.
+       "std_msgs/msg/Header" header
+       float64[] data
+       float64[] noise_variances
+       float64[] bias_variances
+  srvs:
+    CalibConfigWrite
+      request
+        string calib_config
+        
+        bool success
+        string error_message
+      response
+        string calib_config
+        
+        bool success
+        string error_message
+    SafetyInterfaceConfigRead
+      request
+        uint8 calib_location
+        
+        bool success
+        string error_message
+        string safety_interface_config
+      response
+        uint8 calib_location
+        
+        bool success
+        string error_message
+        string safety_interface_config
+    SafetyPresetRead
+      request
+        uint8 index
+        
+        bool success
+        string error_message
+        string safety_preset
+      response
+        uint8 index
+        
+        bool success
+        string error_message
+        string safety_preset
+    ApplicationConfigWrite
+      request
+        string application_config
+        
+        bool success
+        string error_message
+      response
+        string application_config
+        
+        bool success
+        string error_message
+    SafetyInterfaceConfigWrite
+      request
+        string safety_interface_config
+        
+        bool success
+        string error_message
+      response
+        string safety_interface_config
+        
+        bool success
+        string error_message
+    CalibConfigRead
+      request
+        
+        bool success
+        string error_message
+        string calib_config
+      response
+        
+        bool success
+        string error_message
+        string calib_config
+    SafetyPresetWrite
+      request
+        string safety_preset
+        uint8 index
+        
+        bool success
+        string error_message
+      response
+        string safety_preset
+        uint8 index
+        
+        bool success
+        string error_message
+    DeviceInfo
+      request
+        
+        string device_name
+        string serial_number
+        string firmware_version
+        string usb_type_descriptor
+        string firmware_update_id
+        string sensors
+        string physical_port
+      response
+        
+        string device_name
+        string serial_number
+        string firmware_version
+        string usb_type_descriptor
+        string firmware_update_id
+        string sensors
+        string physical_port
+    HardwareMonitorCommandSend
+      request
+        uint32 opcode
+        uint32 param1
+        uint32 param2
+        uint32 param3
+        uint32 param4
+        uint8[] data
+        
+        bool success
+        uint8[] result
+        string error_message
+      response
+        uint32 opcode
+        uint32 param1
+        uint32 param2
+        uint32 param3
+        uint32 param4
+        uint8[] data
+        
+        bool success
+        uint8[] result
+        string error_message
+    ApplicationConfigRead
+      request
+        
+        bool success
+        string error_message
+        string application_config
+      response
+        
+        bool success
+        string error_message
+        string application_config
+  actions:
+  	TriggeredCalibration
+  	  goal
+  	    string json
+  	    string goal_checker_id
+  	  result
+  	    bool success
+  	    string error_msg
+  	    string calibration
+  	    float32 health
+  	  feedback
+  	    float32 progress

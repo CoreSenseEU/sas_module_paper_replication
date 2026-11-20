@@ -1,0 +1,473 @@
+nav2_planner:
+  artifacts:
+    global_costmap:
+      node: /global_costmap/global_costmap
+      publishers:
+        'costmap':
+          type: 'nav_msgs/msg/OccupancyGrid'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'costmap_raw':
+          type: 'nav2_msgs/msg/Costmap'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'costmap_raw_updates':
+          type: 'nav2_msgs/msg/CostmapUpdate'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'costmap_updates':
+          type: 'map_msgs/msg/OccupancyGridUpdate'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'current_room':
+          type: 'std_msgs/msg/String'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'global_costmap/transition_event':
+          type: 'lifecycle_msgs/msg/TransitionEvent'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'obstacle_layer':
+          type: 'nav_msgs/msg/OccupancyGrid'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'obstacle_layer_raw':
+          type: 'nav2_msgs/msg/Costmap'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'obstacle_layer_raw_updates':
+          type: 'nav2_msgs/msg/CostmapUpdate'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'obstacle_layer_updates':
+          type: 'map_msgs/msg/OccupancyGridUpdate'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'published_footprint':
+          type: 'geometry_msgs/msg/PolygonStamped'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'static_layer':
+          type: 'nav_msgs/msg/OccupancyGrid'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'static_layer_raw':
+          type: 'nav2_msgs/msg/Costmap'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'static_layer_raw_updates':
+          type: 'nav2_msgs/msg/CostmapUpdate'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'static_layer_updates':
+          type: 'map_msgs/msg/OccupancyGridUpdate'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+      subscribers:
+        'rear/scan':
+          type: 'sensor_msgs/msg/LaserScan'
+        'footprint':
+          type: 'geometry_msgs/msg/Polygon'
+        'filter_info':
+          type: 'nav2_msgs/msg/CostmapFilterInfo'
+      serviceservers:
+        'clear_around_global_costmap':
+          type: 'nav2_msgs/srv/ClearCostmapAroundRobot'
+        'clear_around_pose_global_costmap':
+          type: 'nav2_msgs/srv/ClearCostmapAroundPose'
+        'clear_entirely_global_costmap':
+          type: 'nav2_msgs/srv/ClearEntireCostmap'
+        'clear_except_global_costmap':
+          type: 'nav2_msgs/srv/ClearCostmapExceptRegion'
+        'get_cost_global_costmap':
+          type: 'nav2_msgs/srv/GetCost'
+        'get_costmap':
+          type: 'nav2_msgs/srv/GetCostmap'
+        'get_obstacle_layer':
+          type: 'nav2_msgs/srv/GetCostmap'
+        'get_static_layer':
+          type: 'nav2_msgs/srv/GetCostmap'
+        'global_costmap/change_state':
+          type: 'lifecycle_msgs/srv/ChangeState'
+        'global_costmap/get_available_states':
+          type: 'lifecycle_msgs/srv/GetAvailableStates'
+        'global_costmap/get_available_transitions':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'global_costmap/get_state':
+          type: 'lifecycle_msgs/srv/GetState'
+        'global_costmap/get_transition_graph':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'global_costmap/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'
+        'room_filter/toggle_filter':
+          type: 'std_srvs/srv/SetBool'
+      parameters:
+        '/bond_disable_heartbeat_timeout':
+          type: Boolean
+          value: true
+        'always_send_full_costmap':
+          type: Boolean
+          value: true
+        'autostart_node':
+          type: Boolean
+          value: false
+        'bond_heartbeat_period':
+          type: Double
+          value: 0.1
+        'filters':
+          type: Array[String]
+          value: ['room_filter']
+        'footprint':
+          type: String
+          value: "[ [0.48, 0.4], [-0.48, 0.4], [-0.48, -0.4], [0.48, -0.4] ]"
+        'footprint_padding':
+          type: Double
+          value: 0.03
+        'global_frame':
+          type: String
+          value: "map"
+        'height':
+          type: Integer
+          value: 5
+        'inflation_layer.cost_scaling_factor':
+          type: Double
+          value: 4.0
+        'inflation_layer.enabled':
+          type: Boolean
+          value: true
+        'inflation_layer.inflate_around_unknown':
+          type: Boolean
+          value: false
+        'inflation_layer.inflate_unknown':
+          type: Boolean
+          value: false
+        'inflation_layer.inflation_radius':
+          type: Double
+          value: 1.0
+        'inflation_layer.plugin':
+          type: String
+          value: "nav2_costmap_2d::InflationLayer"
+        'initial_transform_timeout':
+          type: Double
+          value: 60.0
+        'lethal_cost_threshold':
+          type: Integer
+          value: 100
+        'map_topic':
+          type: String
+          value: "/map"
+        'map_vis_z':
+          type: Double
+          value: 0.0
+        'observation_sources':
+          type: String
+          value: ""
+        'obstacle_layer.combination_method':
+          type: Integer
+          value: 1
+        'obstacle_layer.enabled':
+          type: Boolean
+          value: true
+        'obstacle_layer.footprint_clearing_enabled':
+          type: Boolean
+          value: true
+        'obstacle_layer.max_obstacle_height':
+          type: Double
+          value: 2.0
+        'obstacle_layer.min_obstacle_height':
+          type: Double
+          value: 0.0
+        'obstacle_layer.observation_sources':
+          type: String
+          value: "scan rear_scan"
+        'obstacle_layer.plugin':
+          type: String
+          value: "nav2_costmap_2d::ObstacleLayer"
+        'obstacle_layer.rear_scan.clearing':
+          type: Boolean
+          value: true
+        'obstacle_layer.rear_scan.data_type':
+          type: String
+          value: "LaserScan"
+        'obstacle_layer.rear_scan.expected_update_rate':
+          type: Double
+          value: 0.0
+        'obstacle_layer.rear_scan.inf_is_valid':
+          type: Boolean
+          value: false
+        'obstacle_layer.rear_scan.marking':
+          type: Boolean
+          value: true
+        'obstacle_layer.rear_scan.max_obstacle_height':
+          type: Double
+          value: 2.0
+        'obstacle_layer.rear_scan.min_obstacle_height':
+          type: Double
+          value: 0.0
+        'obstacle_layer.rear_scan.observation_persistence':
+          type: Double
+          value: 0.0
+        'obstacle_layer.rear_scan.obstacle_max_range':
+          type: Double
+          value: 2.5
+        'obstacle_layer.rear_scan.obstacle_min_range':
+          type: Double
+          value: 0.0
+        'obstacle_layer.rear_scan.raytrace_max_range':
+          type: Double
+          value: 3.0
+        'obstacle_layer.rear_scan.raytrace_min_range':
+          type: Double
+          value: 0.0
+        'obstacle_layer.rear_scan.sensor_frame':
+          type: String
+          value: ""
+        'obstacle_layer.rear_scan.topic':
+          type: String
+          value: "/rear/scan"
+        'obstacle_layer.scan.clearing':
+          type: Boolean
+          value: true
+        'obstacle_layer.scan.data_type':
+          type: String
+          value: "LaserScan"
+        'obstacle_layer.scan.expected_update_rate':
+          type: Double
+          value: 0.0
+        'obstacle_layer.scan.inf_is_valid':
+          type: Boolean
+          value: false
+        'obstacle_layer.scan.marking':
+          type: Boolean
+          value: true
+        'obstacle_layer.scan.max_obstacle_height':
+          type: Double
+          value: 2.0
+        'obstacle_layer.scan.min_obstacle_height':
+          type: Double
+          value: 0.0
+        'obstacle_layer.scan.observation_persistence':
+          type: Double
+          value: 0.0
+        'obstacle_layer.scan.obstacle_max_range':
+          type: Double
+          value: 2.5
+        'obstacle_layer.scan.obstacle_min_range':
+          type: Double
+          value: 0.0
+        'obstacle_layer.scan.raytrace_max_range':
+          type: Double
+          value: 3.0
+        'obstacle_layer.scan.raytrace_min_range':
+          type: Double
+          value: 0.0
+        'obstacle_layer.scan.sensor_frame':
+          type: String
+          value: ""
+        'obstacle_layer.scan.topic':
+          type: String
+          value: "/front/scan"
+        'origin_x':
+          type: Double
+          value: 0.0
+        'origin_y':
+          type: Double
+          value: 0.0
+        'plugins':
+          type: Array[String]
+          value: ['static_layer', 'obstacle_layer', 'inflation_layer', 'social_layer']
+        'publish_frequency':
+          type: Double
+          value: 2.0
+        'resolution':
+          type: Double
+          value: 0.05
+        'robot_base_frame':
+          type: String
+          value: "base_link"
+        'robot_radius':
+          type: Double
+          value: 0.1
+        'rolling_window':
+          type: Boolean
+          value: false
+        'room_filter.current_room_topic':
+          type: String
+          value: "current_room"
+        'room_filter.default_room':
+          type: String
+          value: "None"
+        'room_filter.enabled':
+          type: Boolean
+          value: true
+        'room_filter.filter_info_topic':
+          type: String
+          value: "/room_costmap_filter_info"
+        'room_filter.plugin':
+          type: String
+          value: "nav2_costmap_2d::RoomFilter"
+        'room_filter.rooms':
+          type: Array[String]
+          value: ['workcell']
+        'room_filter.transform_tolerance':
+          type: Double
+          value: 0.1
+        'room_filter.workcell':
+          type: Integer
+          value: 50
+        'social_layer.amplitude':
+          type: Double
+          value: 255.0
+        'social_layer.covariance_front_height':
+          type: Double
+          value: 0.4
+        'social_layer.covariance_front_width':
+          type: Double
+          value: 0.25
+        'social_layer.covariance_rear_height':
+          type: Double
+          value: 0.25
+        'social_layer.covariance_rear_width':
+          type: Double
+          value: 0.25
+        'social_layer.covariance_right_height':
+          type: Double
+          value: 0.3
+        'social_layer.covariance_right_width':
+          type: Double
+          value: 0.2
+        'social_layer.covariance_when_still':
+          type: Double
+          value: 0.25
+        'social_layer.cutoff':
+          type: Double
+          value: 10.0
+        'social_layer.enabled':
+          type: Boolean
+          value: false
+        'social_layer.people_topic':
+          type: String
+          value: "/people"
+        'social_layer.plugin':
+          type: String
+          value: "nav2_social_costmap_plugin::SocialLayer"
+        'social_layer.publish_occgrid':
+          type: Boolean
+          value: false
+        'social_layer.speed_factor_multiplier':
+          type: Double
+          value: 5.0
+        'social_layer.use_passing':
+          type: Boolean
+          value: false
+        'social_layer.use_vel_factor':
+          type: Boolean
+          value: true
+        'start_type_description_service':
+          type: Boolean
+          value: true
+        'static_layer.enabled':
+          type: Boolean
+          value: true
+        'static_layer.footprint_clearing_enabled':
+          type: Boolean
+          value: false
+        'static_layer.map_subscribe_transient_local':
+          type: Boolean
+          value: true
+        'static_layer.map_topic':
+          type: String
+          value: ""
+        'static_layer.plugin':
+          type: String
+          value: "nav2_costmap_2d::StaticLayer"
+        'static_layer.subscribe_to_updates':
+          type: Boolean
+          value: false
+        'static_layer.transform_tolerance':
+          type: Double
+          value: 0.0
+        'track_unknown_space':
+          type: Boolean
+          value: true
+        'transform_tolerance':
+          type: Double
+          value: 0.3
+        'trinary_costmap':
+          type: Boolean
+          value: true
+        'unknown_cost_value':
+          type: Integer
+          value: 255
+        'update_frequency':
+          type: Double
+          value: 5.0
+        'use_maximum':
+          type: Boolean
+          value: false
+        'use_sim_time':
+          type: Boolean
+          value: false
+        'width':
+          type: Integer
+          value: 5

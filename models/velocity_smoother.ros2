@@ -1,0 +1,102 @@
+nav2_velocity_smoother:
+  artifacts:
+    velocity_smoother:
+      node: velocity_smoother
+      publishers:
+        'bond':
+          type: 'bond/msg/Status'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'cmd_vel_smoothed':
+          type: 'geometry_msgs/msg/Twist'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'velocity_smoother/transition_event':
+          type: 'lifecycle_msgs/msg/TransitionEvent'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+      subscribers:
+        'bond':
+          type: 'bond/msg/Status'
+        'cmd_vel_nav':
+          type: 'geometry_msgs/msg/Twist'
+      serviceservers:
+        'velocity_smoother/change_state':
+          type: 'lifecycle_msgs/srv/ChangeState'
+        'velocity_smoother/get_available_states':
+          type: 'lifecycle_msgs/srv/GetAvailableStates'
+        'velocity_smoother/get_available_transitions':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'velocity_smoother/get_state':
+          type: 'lifecycle_msgs/srv/GetState'
+        'velocity_smoother/get_transition_graph':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'velocity_smoother/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'
+      parameters:
+        '/bond_disable_heartbeat_timeout':
+          type: Boolean
+          value: true
+        'autostart_node':
+          type: Boolean
+          value: false
+        'bond_heartbeat_period':
+          type: Double
+          value: 0.1
+        'deadband_velocity':
+          type: Array[Double]
+          value: [0.0, 0.0, 0.0]
+        'enable_stamped_cmd_vel':
+          type: Boolean
+          value: false
+        'feedback':
+          type: String
+          value: "OPEN_LOOP"
+        'max_accel':
+          type: Array[Double]
+          value: [0.2, 0.15, 0.3]
+        'max_decel':
+          type: Array[Double]
+          value: [-0.2, -0.15, -0.3]
+        'max_velocity':
+          type: Array[Double]
+          value: [0.4, 0.4, 0.5]
+        'min_velocity':
+          type: Array[Double]
+          value: [-0.4, -0.4, -0.5]
+        'odom_duration':
+          type: Double
+          value: 0.1
+        'odom_topic':
+          type: String
+          value: "odom"
+        'scale_velocities':
+          type: Boolean
+          value: false
+        'smoothing_frequency':
+          type: Double
+          value: 20.0
+        'start_type_description_service':
+          type: Boolean
+          value: true
+        'use_realtime_priority':
+          type: Boolean
+          value: false
+        'use_sim_time':
+          type: Boolean
+          value: false
+        'velocity_timeout':
+          type: Double
+          value: 1.0

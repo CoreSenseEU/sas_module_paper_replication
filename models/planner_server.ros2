@@ -1,0 +1,95 @@
+nav2_planner:
+  artifacts:
+    planner_server:
+      node: planner_server
+      publishers:
+        'bond':
+          type: 'bond/msg/Status'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'plan':
+          type: 'nav_msgs/msg/Path'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'planner_server/transition_event':
+          type: 'lifecycle_msgs/msg/TransitionEvent'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+      subscribers:
+        'bond':
+          type: 'bond/msg/Status'
+      actionservers:
+        'compute_path_through_poses':
+          type: 'nav2_msgs/action/ComputePathThroughPoses'
+        'compute_path_to_pose':
+          type: 'nav2_msgs/action/ComputePathToPose'
+      serviceservers:
+        'is_path_valid':
+          type: 'nav2_msgs/srv/IsPathValid'
+        'planner_server/change_state':
+          type: 'lifecycle_msgs/srv/ChangeState'
+        'planner_server/get_available_states':
+          type: 'lifecycle_msgs/srv/GetAvailableStates'
+        'planner_server/get_available_transitions':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'planner_server/get_state':
+          type: 'lifecycle_msgs/srv/GetState'
+        'planner_server/get_transition_graph':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'planner_server/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'
+      parameters:
+        '/bond_disable_heartbeat_timeout':
+          type: Boolean
+          value: true
+        'GridBased.allow_unknown':
+          type: Boolean
+          value: true
+        'GridBased.plugin':
+          type: String
+          value: "nav2_navfn_planner::NavfnPlanner"
+        'GridBased.tolerance':
+          type: Double
+          value: 0.5
+        'GridBased.use_astar':
+          type: Boolean
+          value: true
+        'GridBased.use_final_approach_orientation':
+          type: Boolean
+          value: false
+        'action_server_result_timeout':
+          type: Double
+          value: 10.0
+        'autostart_node':
+          type: Boolean
+          value: false
+        'bond_heartbeat_period':
+          type: Double
+          value: 0.1
+        'costmap_update_timeout':
+          type: Double
+          value: 1.0
+        'expected_planner_frequency':
+          type: Double
+          value: 20.0
+        'planner_plugins':
+          type: Array[String]
+          value: ['GridBased']
+        'start_type_description_service':
+          type: Boolean
+          value: true
+        'use_sim_time':
+          type: Boolean
+          value: false

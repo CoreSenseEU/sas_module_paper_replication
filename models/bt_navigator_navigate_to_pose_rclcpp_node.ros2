@@ -1,0 +1,32 @@
+nav2_bt_navigator:
+  artifacts:
+    bt_navigator_navigate_to_pose_rclcpp_node:
+      node: bt_navigator_navigate_to_pose_rclcpp_node
+      publishers:
+        'behavior_tree_log':
+          type: 'nav2_msgs/msg/BehaviorTreeLog'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+      subscribers:
+        'controller_selector':
+          type: 'std_msgs/msg/String'
+        'planner_selector':
+          type: 'std_msgs/msg/String'
+      actionclients:
+        'backup':
+          type: 'nav2_msgs/action/BackUp'
+        'compute_path_to_pose':
+          type: 'nav2_msgs/action/ComputePathToPose'
+        'follow_path':
+          type: 'nav2_msgs/action/FollowPath'
+        'spin':
+          type: 'nav2_msgs/action/Spin'
+        'wait':
+          type: 'nav2_msgs/action/Wait'
+      serviceservers:
+        'bt_navigator_navigate_to_pose_rclcpp_node/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'

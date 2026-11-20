@@ -1,0 +1,69 @@
+nav2_collision_monitor:
+  artifacts:
+    nav2_collision_monitor:
+      node: collision_monitor
+      publishers:
+        'bond':
+          type: 'bond/msg/Status'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'cmd_vel':
+          type: 'geometry_msgs/msg/Twist'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'collision_monitor/collision_points_marker':
+          type: 'visualization_msgs/msg/MarkerArray'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'collision_monitor/transition_event':
+          type: 'lifecycle_msgs/msg/TransitionEvent'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'collision_monitor_state':
+          type: 'nav2_msgs/msg/CollisionMonitorState'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+      subscribers:
+        'bond':
+          type: 'bond/msg/Status'
+        'cmd_vel_smoothed':
+          type: 'geometry_msgs/msg/Twist'
+        'front/scan':
+          type: 'sensor_msgs/msg/LaserScan'
+        'local_costmap/published_footprint':
+          type: 'geometry_msgs/msg/PolygonStamped'
+        'rear/scan':
+          type: 'sensor_msgs/msg/LaserScan'
+      serviceservers:
+        'collision_monitor/change_state':
+          type: 'lifecycle_msgs/srv/ChangeState'
+        'collision_monitor/get_available_states':
+          type: 'lifecycle_msgs/srv/GetAvailableStates'
+        'collision_monitor/get_available_transitions':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'collision_monitor/get_state':
+          type: 'lifecycle_msgs/srv/GetState'
+        'collision_monitor/get_transition_graph':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'collision_monitor/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'

@@ -1,0 +1,65 @@
+rem_tiago:
+  artifacts:
+    nav2_plugin_configurer:
+      node: /nav2_plugin_configurer
+      publishers:
+        'controller_selector':
+          type: 'std_msgs/msg/String'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'goal_checker_selector':
+          type: 'std_msgs/msg/String'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'planner_selector':
+          type: 'std_msgs/msg/String'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'smoother_selector':
+          type: 'std_msgs/msg/String'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+      parameters:
+        'controller_topic':
+          type: String
+          value: "controller_selector"
+        'goal_checker_topic':
+          type: String
+          value: "goal_checker_selector"
+        'planner_topic':
+          type: String
+          value: "planner_selector"
+        'selected_controller':
+          type: String
+          value: "FollowPath"
+        'selected_goal_checker':
+          type: String
+          value: "general_goal_checker"
+        'selected_planner':
+          type: String
+          value: "GridBased"
+        'selected_smoother':
+          type: String
+          value: "simple_smoother"
+        'smoother_topic':
+          type: String
+          value: "smoother_selector"
+        'use_sim_time':
+          type: Boolean
+          value: false

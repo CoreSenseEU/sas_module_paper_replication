@@ -1,0 +1,35 @@
+robot_state_publisher:
+  artifacts:
+    robot_state_publisher:
+      node: /robot_state_publisher
+      publishers:
+        'ur10/robot_description':
+          type: 'std_msgs/msg/String'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'ur10/tf':
+          type: 'tf2_msgs/msg/TFMessage'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'ur10/tf_static':
+          type: 'tf2_msgs/msg/TFMessage'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+      subscribers:
+        'ur10/joint_states':
+          type: 'sensor_msgs/msg/JointState'
+      serviceservers:
+        'robot_state_publisher/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'

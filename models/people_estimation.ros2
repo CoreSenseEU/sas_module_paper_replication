@@ -1,0 +1,204 @@
+coresense_people_estimation:
+  artifacts:
+    people_estimation:
+      node: people_estimation
+      publishers:
+        'people':
+          type: 'people_msgs/msg/People'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'people_estimation/debug_markers':
+          type: 'visualization_msgs/msg/MarkerArray'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'tf':
+          type: 'tf2_msgs/msg/TFMessage'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+      parameters:
+        'allow_latest_transform_fallback':
+          type: Boolean
+          value: true
+        'background_min_far_frac':
+          type: Double
+          value: 0.03
+        'background_min_pixels':
+          type: Integer
+          value: 40
+        'background_step_m':
+          type: Double
+          value: 0.3
+        'background_strip_frac':
+          type: Double
+          value: 0.25
+        'camera_info_topic':
+          type: String
+          value: "/camera/camera/color/camera_info"
+        'cmd_vel_timeout':
+          type: Double
+          value: 0.5
+        'cmd_vel_topic':
+          type: String
+          value: "/bluetooth_teleop/cmd_vel"
+        'coast_max_s':
+          type: Double
+          value: 3.0
+        'coast_process_sigma':
+          type: Double
+          value: 0.3
+        'confirm_frames':
+          type: Integer
+          value: 3
+        'confirm_reset_timeout':
+          type: Double
+          value: 0.5
+        'debug':
+          type: Boolean
+          value: true
+        'debug_marker_lifetime':
+          type: Double
+          value: 0.5
+        'debug_person_frame_prefix':
+          type: String
+          value: "person_"
+        'debug_person_frames':
+          type: Boolean
+          value: true
+        'debug_person_radius':
+          type: Double
+          value: 0.2
+        'debug_show_raw':
+          type: Boolean
+          value: true
+        'debug_topic':
+          type: String
+          value: "~/debug_markers"
+        'debug_velocity_scale':
+          type: Double
+          value: 1.0
+        'depth_max_m':
+          type: Double
+          value: 3.0
+        'depth_min_m':
+          type: Double
+          value: 0.1
+        'depth_noise_coeff':
+          type: Double
+          value: 0.0014
+        'depth_percentile':
+          type: Double
+          value: 10.0
+        'depth_spread_gain':
+          type: Double
+          value: 1.0
+        'depth_topic':
+          type: String
+          value: "/camera/camera/aligned_depth_to_color/image_raw"
+        'derotate_history':
+          type: Boolean
+          value: false
+        'detections_topic':
+          type: String
+          value: "/riskam/person_detections"
+        'history_maxlen':
+          type: Integer
+          value: 60
+        'implausible_patience':
+          type: Integer
+          value: 3
+        'keypoint_patch_radius':
+          type: Integer
+          value: 3
+        'max_person_speed':
+          type: Double
+          value: 2.5
+        'people_topic':
+          type: String
+          value: "/people"
+        'pixel_sigma_frac':
+          type: Double
+          value: 0.25
+        'plausibility_reset_timeout':
+          type: Double
+          value: 2.0
+        'publish_covariance_tags':
+          type: Boolean
+          value: false
+        'reliability_keypoints_full':
+          type: Double
+          value: 8.0
+        'reliability_sigma_scale':
+          type: Double
+          value: 0.25
+        'reliability_valid_frac_full':
+          type: Double
+          value: 0.5
+        'require_cmd_vel':
+          type: Boolean
+          value: false
+        'robot_base_frame':
+          type: String
+          value: "base_link"
+        'spike_max_holds':
+          type: Integer
+          value: 5
+        'spike_reset_timeout':
+          type: Double
+          value: 1.0
+        'start_type_description_service':
+          type: Boolean
+          value: true
+        'sync_queue_size':
+          type: Integer
+          value: 10
+        'sync_slop':
+          type: Double
+          value: 0.1
+        'target_frame':
+          type: String
+          value: "map"
+        'transform_timeout':
+          type: Double
+          value: 0.1
+        'use_sim_time':
+          type: Boolean
+          value: false
+        'velocity_epsilon':
+          type: Double
+          value: 0.05
+        'velocity_gait_sigma_m':
+          type: Double
+          value: 0.03
+        'velocity_max_gap_s':
+          type: Double
+          value: 0.5
+        'velocity_min_span_s':
+          type: Double
+          value: 0.3
+        'velocity_prior_variance':
+          type: Double
+          value: 1.0
+        'velocity_window_chi2_max':
+          type: Double
+          value: 3.0
+        'velocity_window_max_s':
+          type: Double
+          value: 2.0
+        'velocity_window_min_s':
+          type: Double
+          value: 0.6
+        'velocity_window_sigma_scale':
+          type: Double
+          value: 0.25

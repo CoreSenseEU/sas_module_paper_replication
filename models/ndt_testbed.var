@@ -1,0 +1,42 @@
+feature_model 
+{
+	name ndt_testbed
+	root selected Feature NDT id NDT
+	children{
+		selected Feature Navigate id N
+			children 
+			{
+				mandatory selected Feature Controlling id CNTRLING
+				children 
+				{
+					mandatory selected Feature Controller id CNTRLER
+					children
+					{
+						mandatory selected Alternative PrimaryController id PCNTRL
+						children
+						{
+								selected Feature MPPI_OMNI id MPPI_OMNI,
+								Feature MPPI_DIFF id MPPI_DIFF,
+								Feature MPPI_DIFF_HISPEED id MPPI_DIFF_HISPEED
+						},
+						mandatory selected Alternative MaximumVelocity id MAXVEL
+						children
+						{
+								selected Feature DefaultVelocity id DEF_VEL,
+								Feature HigherVelocity id HI_VEL
+						}
+					}
+				},
+				mandatory selected Feature GlobalCostmap id GCostmap
+				children
+				{
+					Feature SocialLayer id SOCLAYERS
+				},
+				Feature RecoverLidar id RECOVER_LID
+			},
+			Feature DetectHumans id DETECTHUMANS
+		}
+crossTreeConstraints{
+			 }
+			  
+}

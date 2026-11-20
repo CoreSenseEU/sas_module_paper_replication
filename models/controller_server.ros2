@@ -1,0 +1,938 @@
+nav2_controller:
+  artifacts:
+    controller_server:
+      node: controller_server
+      publishers:
+        'bond':
+          type: 'bond/msg/Status'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'cmd_vel_nav':
+          type: 'geometry_msgs/msg/Twist'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'controller_server/transition_event':
+          type: 'lifecycle_msgs/msg/TransitionEvent'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'optimal_trajectory':
+          type: 'nav_msgs/msg/Path'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'trajectories':
+          type: 'visualization_msgs/msg/MarkerArray'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'transformed_global_plan':
+          type: 'nav_msgs/msg/Path'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+      subscribers:
+        'bond':
+          type: 'bond/msg/Status'
+        'odom':
+          type: 'nav_msgs/msg/Odometry'
+        'speed_limit':
+          type: 'nav2_msgs/msg/SpeedLimit'
+      actionservers:
+        'follow_path':
+          type: 'nav2_msgs/action/FollowPath'
+      serviceservers:
+        'controller_server/change_state':
+          type: 'lifecycle_msgs/srv/ChangeState'
+        'controller_server/get_available_states':
+          type: 'lifecycle_msgs/srv/GetAvailableStates'
+        'controller_server/get_available_transitions':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'controller_server/get_state':
+          type: 'lifecycle_msgs/srv/GetState'
+        'controller_server/get_transition_graph':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'controller_server/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'
+      parameters:
+        '.position_checker.stateful':
+          type: Boolean
+          value: true
+        '.position_checker.xy_goal_tolerance':
+          type: Double
+          value: 0.25
+        '/bond_disable_heartbeat_timeout':
+          type: Boolean
+          value: true
+        'FollowPath.ConstraintCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath.ConstraintCritic.cost_weight':
+          type: Double
+          value: 4.0
+        'FollowPath.ConstraintCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath.CostCritic.collision_cost':
+          type: Double
+          value: 1000000.0
+        'FollowPath.CostCritic.consider_footprint':
+          type: Boolean
+          value: true
+        'FollowPath.CostCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath.CostCritic.cost_weight':
+          type: Double
+          value: 3.81
+        'FollowPath.CostCritic.critical_cost':
+          type: Double
+          value: 300.0
+        'FollowPath.CostCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath.CostCritic.inflation_layer_name':
+          type: String
+          value: ""
+        'FollowPath.CostCritic.near_collision_cost':
+          type: Integer
+          value: 253
+        'FollowPath.CostCritic.near_goal_distance':
+          type: Double
+          value: 1.0
+        'FollowPath.CostCritic.trajectory_point_step':
+          type: Integer
+          value: 2
+        'FollowPath.GoalAngleCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath.GoalAngleCritic.cost_weight':
+          type: Double
+          value: 4.0
+        'FollowPath.GoalAngleCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath.GoalAngleCritic.symmetric_yaw_tolerance':
+          type: Boolean
+          value: false
+        'FollowPath.GoalAngleCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath.GoalCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath.GoalCritic.cost_weight':
+          type: Double
+          value: 6.0
+        'FollowPath.GoalCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath.GoalCritic.threshold_to_consider':
+          type: Double
+          value: 1.0
+        'FollowPath.PathAlignCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath.PathAlignCritic.cost_weight':
+          type: Double
+          value: 14.0
+        'FollowPath.PathAlignCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath.PathAlignCritic.max_path_occupancy_ratio':
+          type: Double
+          value: 0.05
+        'FollowPath.PathAlignCritic.offset_from_furthest':
+          type: Integer
+          value: 20
+        'FollowPath.PathAlignCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath.PathAlignCritic.trajectory_point_step':
+          type: Integer
+          value: 4
+        'FollowPath.PathAlignCritic.use_path_orientations':
+          type: Boolean
+          value: false
+        'FollowPath.PathAngleCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath.PathAngleCritic.cost_weight':
+          type: Double
+          value: 2.0
+        'FollowPath.PathAngleCritic.enabled':
+          type: Boolean
+          value: false
+        'FollowPath.PathAngleCritic.max_angle_to_furthest':
+          type: Double
+          value: 1.0
+        'FollowPath.PathAngleCritic.mode':
+          type: Integer
+          value: 0
+        'FollowPath.PathAngleCritic.offset_from_furthest':
+          type: Integer
+          value: 4
+        'FollowPath.PathAngleCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath.PathFollowCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath.PathFollowCritic.cost_weight':
+          type: Double
+          value: 5.0
+        'FollowPath.PathFollowCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath.PathFollowCritic.offset_from_furthest':
+          type: Integer
+          value: 5
+        'FollowPath.PathFollowCritic.threshold_to_consider':
+          type: Double
+          value: 1.4
+        'FollowPath.PreferForwardCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath.PreferForwardCritic.cost_weight':
+          type: Double
+          value: 2.0
+        'FollowPath.PreferForwardCritic.enabled':
+          type: Boolean
+          value: false
+        'FollowPath.PreferForwardCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath.TrajectoryVisualizer.time_step':
+          type: Integer
+          value: 3
+        'FollowPath.TrajectoryVisualizer.trajectory_step':
+          type: Integer
+          value: 5
+        'FollowPath.ax_max':
+          type: Double
+          value: 25.0
+        'FollowPath.ax_min':
+          type: Double
+          value: -10.0
+        'FollowPath.ay_max':
+          type: Double
+          value: 3.0
+        'FollowPath.ay_min':
+          type: Double
+          value: -3.0
+        'FollowPath.az_max':
+          type: Double
+          value: 3.5
+        'FollowPath.batch_size':
+          type: Integer
+          value: 2000
+        'FollowPath.critics':
+          type: Array[String]
+          value: ['ConstraintCritic', 'CostCritic', 'GoalCritic', 'GoalAngleCritic', 'PathAlignCritic', 'PathFollowCritic', 'PathAngleCritic', 'PreferForwardCritic']
+        'FollowPath.enforce_path_inversion':
+          type: Boolean
+          value: false
+        'FollowPath.gamma':
+          type: Double
+          value: 0.015
+        'FollowPath.iteration_count':
+          type: Integer
+          value: 1
+        'FollowPath.max_robot_pose_search_dist':
+          type: Double
+          value: 1.5
+        'FollowPath.model_dt':
+          type: Double
+          value: 0.1
+        'FollowPath.motion_model':
+          type: String
+          value: "Omni"
+        'FollowPath.open_loop':
+          type: Boolean
+          value: false
+        'FollowPath.plugin':
+          type: String
+          value: "nav2_mppi_controller::MPPIController"
+        'FollowPath.prune_distance':
+          type: Double
+          value: 1.7
+        'FollowPath.regenerate_noises':
+          type: Boolean
+          value: false
+        'FollowPath.retry_attempt_limit':
+          type: Integer
+          value: 1
+        'FollowPath.temperature':
+          type: Double
+          value: 0.3
+        'FollowPath.time_steps':
+          type: Integer
+          value: 56
+        'FollowPath.transform_tolerance':
+          type: Double
+          value: 0.1
+        'FollowPath.visualize':
+          type: Boolean
+          value: true
+        'FollowPath.vx_max':
+          type: Double
+          value: 1.1
+        'FollowPath.vx_min':
+          type: Double
+          value: -1.1
+        'FollowPath.vx_std':
+          type: Double
+          value: 0.25
+        'FollowPath.vy_max':
+          type: Double
+          value: 0.0
+        'FollowPath.vy_std':
+          type: Double
+          value: 0.2
+        'FollowPath.wz_max':
+          type: Double
+          value: 1.0
+        'FollowPath.wz_std':
+          type: Double
+          value: 0.3
+        'FollowPath_DifferentialShim.ConstraintCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShim.ConstraintCritic.cost_weight':
+          type: Double
+          value: 4.0
+        'FollowPath_DifferentialShim.ConstraintCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShim.CostCritic.collision_cost':
+          type: Double
+          value: 1000000.0
+        'FollowPath_DifferentialShim.CostCritic.consider_footprint':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShim.CostCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShim.CostCritic.cost_weight':
+          type: Double
+          value: 3.81
+        'FollowPath_DifferentialShim.CostCritic.critical_cost':
+          type: Double
+          value: 300.0
+        'FollowPath_DifferentialShim.CostCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShim.CostCritic.inflation_layer_name':
+          type: String
+          value: ""
+        'FollowPath_DifferentialShim.CostCritic.near_collision_cost':
+          type: Integer
+          value: 253
+        'FollowPath_DifferentialShim.CostCritic.near_goal_distance':
+          type: Double
+          value: 1.0
+        'FollowPath_DifferentialShim.CostCritic.trajectory_point_step':
+          type: Integer
+          value: 2
+        'FollowPath_DifferentialShim.GoalAngleCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShim.GoalAngleCritic.cost_weight':
+          type: Double
+          value: 4.0
+        'FollowPath_DifferentialShim.GoalAngleCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShim.GoalAngleCritic.symmetric_yaw_tolerance':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShim.GoalAngleCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShim.GoalCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShim.GoalCritic.cost_weight':
+          type: Double
+          value: 6.0
+        'FollowPath_DifferentialShim.GoalCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShim.GoalCritic.threshold_to_consider':
+          type: Double
+          value: 1.0
+        'FollowPath_DifferentialShim.PathAlignCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShim.PathAlignCritic.cost_weight':
+          type: Double
+          value: 14.0
+        'FollowPath_DifferentialShim.PathAlignCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShim.PathAlignCritic.max_path_occupancy_ratio':
+          type: Double
+          value: 0.05
+        'FollowPath_DifferentialShim.PathAlignCritic.offset_from_furthest':
+          type: Integer
+          value: 20
+        'FollowPath_DifferentialShim.PathAlignCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShim.PathAlignCritic.trajectory_point_step':
+          type: Integer
+          value: 4
+        'FollowPath_DifferentialShim.PathAlignCritic.use_path_orientations':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShim.PathAngleCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShim.PathAngleCritic.cost_weight':
+          type: Double
+          value: 2.0
+        'FollowPath_DifferentialShim.PathAngleCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShim.PathAngleCritic.max_angle_to_furthest':
+          type: Double
+          value: 1.0
+        'FollowPath_DifferentialShim.PathAngleCritic.mode':
+          type: Integer
+          value: 0
+        'FollowPath_DifferentialShim.PathAngleCritic.offset_from_furthest':
+          type: Integer
+          value: 4
+        'FollowPath_DifferentialShim.PathAngleCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShim.PathFollowCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShim.PathFollowCritic.cost_weight':
+          type: Double
+          value: 5.0
+        'FollowPath_DifferentialShim.PathFollowCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShim.PathFollowCritic.offset_from_furthest':
+          type: Integer
+          value: 5
+        'FollowPath_DifferentialShim.PathFollowCritic.threshold_to_consider':
+          type: Double
+          value: 1.4
+        'FollowPath_DifferentialShim.PreferForwardCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShim.PreferForwardCritic.cost_weight':
+          type: Double
+          value: 2.0
+        'FollowPath_DifferentialShim.PreferForwardCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShim.PreferForwardCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShim.TrajectoryVisualizer.time_step':
+          type: Integer
+          value: 3
+        'FollowPath_DifferentialShim.TrajectoryVisualizer.trajectory_step':
+          type: Integer
+          value: 5
+        'FollowPath_DifferentialShim.angular_disengage_threshold':
+          type: Double
+          value: 0.3925
+        'FollowPath_DifferentialShim.angular_dist_threshold':
+          type: Double
+          value: 0.95
+        'FollowPath_DifferentialShim.ax_max':
+          type: Double
+          value: 3.0
+        'FollowPath_DifferentialShim.ax_min':
+          type: Double
+          value: -3.0
+        'FollowPath_DifferentialShim.ay_max':
+          type: Double
+          value: 3.0
+        'FollowPath_DifferentialShim.ay_min':
+          type: Double
+          value: -3.0
+        'FollowPath_DifferentialShim.az_max':
+          type: Double
+          value: 3.5
+        'FollowPath_DifferentialShim.batch_size':
+          type: Integer
+          value: 2000
+        'FollowPath_DifferentialShim.closed_loop':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShim.critics':
+          type: Array[String]
+          value: ['ConstraintCritic', 'CostCritic', 'GoalCritic', 'GoalAngleCritic', 'PathAlignCritic', 'PathFollowCritic', 'PathAngleCritic', 'PreferForwardCritic']
+        'FollowPath_DifferentialShim.enforce_path_inversion':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShim.forward_sampling_distance':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShim.gamma':
+          type: Double
+          value: 0.015
+        'FollowPath_DifferentialShim.iteration_count':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShim.max_angular_accel':
+          type: Double
+          value: 3.2
+        'FollowPath_DifferentialShim.max_cost_threshold':
+          type: Double
+          value: 254.0
+        'FollowPath_DifferentialShim.max_robot_pose_search_dist':
+          type: Double
+          value: 1.5
+        'FollowPath_DifferentialShim.model_dt':
+          type: Double
+          value: 0.1
+        'FollowPath_DifferentialShim.motion_model':
+          type: String
+          value: "DiffDrive"
+        'FollowPath_DifferentialShim.open_loop':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShim.plugin':
+          type: String
+          value: "nav2_rotation_shim_controller::RotationShimController"
+        'FollowPath_DifferentialShim.primary_controller':
+          type: String
+          value: "nav2_mppi_controller::MPPIController"
+        'FollowPath_DifferentialShim.prune_distance':
+          type: Double
+          value: 1.7
+        'FollowPath_DifferentialShim.regenerate_noises':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShim.retry_attempt_limit':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShim.rotate_to_goal_heading':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShim.rotate_to_heading_angular_vel':
+          type: Double
+          value: 1.8
+        'FollowPath_DifferentialShim.rotate_to_heading_once':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShim.simulate_ahead_time':
+          type: Double
+          value: 1.0
+        'FollowPath_DifferentialShim.temperature':
+          type: Double
+          value: 0.3
+        'FollowPath_DifferentialShim.time_steps':
+          type: Integer
+          value: 56
+        'FollowPath_DifferentialShim.transform_tolerance':
+          type: Double
+          value: 0.1
+        'FollowPath_DifferentialShim.use_path_orientations':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShim.visualize':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShim.vx_max':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShim.vx_min':
+          type: Double
+          value: -0.35
+        'FollowPath_DifferentialShim.vx_std':
+          type: Double
+          value: 0.2
+        'FollowPath_DifferentialShim.vy_max':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShim.vy_std':
+          type: Double
+          value: 0.2
+        'FollowPath_DifferentialShim.wz_max':
+          type: Double
+          value: 1.0
+        'FollowPath_DifferentialShim.wz_std':
+          type: Double
+          value: 0.3
+        'FollowPath_DifferentialShimFast.ConstraintCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShimFast.ConstraintCritic.cost_weight':
+          type: Double
+          value: 4.0
+        'FollowPath_DifferentialShimFast.ConstraintCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShimFast.CostCritic.collision_cost':
+          type: Double
+          value: 1000000.0
+        'FollowPath_DifferentialShimFast.CostCritic.consider_footprint':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShimFast.CostCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShimFast.CostCritic.cost_weight':
+          type: Double
+          value: 3.81
+        'FollowPath_DifferentialShimFast.CostCritic.critical_cost':
+          type: Double
+          value: 300.0
+        'FollowPath_DifferentialShimFast.CostCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShimFast.CostCritic.inflation_layer_name':
+          type: String
+          value: ""
+        'FollowPath_DifferentialShimFast.CostCritic.near_collision_cost':
+          type: Integer
+          value: 253
+        'FollowPath_DifferentialShimFast.CostCritic.near_goal_distance':
+          type: Double
+          value: 1.0
+        'FollowPath_DifferentialShimFast.CostCritic.trajectory_point_step':
+          type: Integer
+          value: 2
+        'FollowPath_DifferentialShimFast.GoalAngleCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShimFast.GoalAngleCritic.cost_weight':
+          type: Double
+          value: 4.0
+        'FollowPath_DifferentialShimFast.GoalAngleCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShimFast.GoalAngleCritic.symmetric_yaw_tolerance':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShimFast.GoalAngleCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShimFast.GoalCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShimFast.GoalCritic.cost_weight':
+          type: Double
+          value: 6.0
+        'FollowPath_DifferentialShimFast.GoalCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShimFast.GoalCritic.threshold_to_consider':
+          type: Double
+          value: 1.0
+        'FollowPath_DifferentialShimFast.PathAlignCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShimFast.PathAlignCritic.cost_weight':
+          type: Double
+          value: 14.0
+        'FollowPath_DifferentialShimFast.PathAlignCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShimFast.PathAlignCritic.max_path_occupancy_ratio':
+          type: Double
+          value: 0.05
+        'FollowPath_DifferentialShimFast.PathAlignCritic.offset_from_furthest':
+          type: Integer
+          value: 20
+        'FollowPath_DifferentialShimFast.PathAlignCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShimFast.PathAlignCritic.trajectory_point_step':
+          type: Integer
+          value: 4
+        'FollowPath_DifferentialShimFast.PathAlignCritic.use_path_orientations':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShimFast.PathAngleCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShimFast.PathAngleCritic.cost_weight':
+          type: Double
+          value: 2.0
+        'FollowPath_DifferentialShimFast.PathAngleCritic.enabled':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShimFast.PathAngleCritic.max_angle_to_furthest':
+          type: Double
+          value: 1.0
+        'FollowPath_DifferentialShimFast.PathAngleCritic.mode':
+          type: Integer
+          value: 0
+        'FollowPath_DifferentialShimFast.PathAngleCritic.offset_from_furthest':
+          type: Integer
+          value: 4
+        'FollowPath_DifferentialShimFast.PathAngleCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShimFast.PathFollowCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShimFast.PathFollowCritic.cost_weight':
+          type: Double
+          value: 5.0
+        'FollowPath_DifferentialShimFast.PathFollowCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShimFast.PathFollowCritic.offset_from_furthest':
+          type: Integer
+          value: 5
+        'FollowPath_DifferentialShimFast.PathFollowCritic.threshold_to_consider':
+          type: Double
+          value: 1.4
+        'FollowPath_DifferentialShimFast.PreferForwardCritic.cost_power':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShimFast.PreferForwardCritic.cost_weight':
+          type: Double
+          value: 2.0
+        'FollowPath_DifferentialShimFast.PreferForwardCritic.enabled':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShimFast.PreferForwardCritic.threshold_to_consider':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShimFast.TrajectoryVisualizer.time_step':
+          type: Integer
+          value: 3
+        'FollowPath_DifferentialShimFast.TrajectoryVisualizer.trajectory_step':
+          type: Integer
+          value: 5
+        'FollowPath_DifferentialShimFast.angular_disengage_threshold':
+          type: Double
+          value: 0.3925
+        'FollowPath_DifferentialShimFast.angular_dist_threshold':
+          type: Double
+          value: 0.95
+        'FollowPath_DifferentialShimFast.ax_max':
+          type: Double
+          value: 25.0
+        'FollowPath_DifferentialShimFast.ax_min':
+          type: Double
+          value: -10.0
+        'FollowPath_DifferentialShimFast.ay_max':
+          type: Double
+          value: 0.0
+        'FollowPath_DifferentialShimFast.ay_min':
+          type: Double
+          value: -3.0
+        'FollowPath_DifferentialShimFast.az_max':
+          type: Double
+          value: 3.5
+        'FollowPath_DifferentialShimFast.batch_size':
+          type: Integer
+          value: 2000
+        'FollowPath_DifferentialShimFast.closed_loop':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShimFast.critics':
+          type: Array[String]
+          value: ['ConstraintCritic', 'CostCritic', 'GoalCritic', 'GoalAngleCritic', 'PathAlignCritic', 'PathFollowCritic', 'PathAngleCritic', 'PreferForwardCritic']
+        'FollowPath_DifferentialShimFast.enforce_path_inversion':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShimFast.forward_sampling_distance':
+          type: Double
+          value: 0.5
+        'FollowPath_DifferentialShimFast.gamma':
+          type: Double
+          value: 0.015
+        'FollowPath_DifferentialShimFast.iteration_count':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShimFast.max_angular_accel':
+          type: Double
+          value: 3.2
+        'FollowPath_DifferentialShimFast.max_cost_threshold':
+          type: Double
+          value: 254.0
+        'FollowPath_DifferentialShimFast.max_robot_pose_search_dist':
+          type: Double
+          value: 1.5
+        'FollowPath_DifferentialShimFast.model_dt':
+          type: Double
+          value: 0.1
+        'FollowPath_DifferentialShimFast.motion_model':
+          type: String
+          value: "DiffDrive"
+        'FollowPath_DifferentialShimFast.open_loop':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShimFast.plugin':
+          type: String
+          value: "nav2_rotation_shim_controller::RotationShimController"
+        'FollowPath_DifferentialShimFast.primary_controller':
+          type: String
+          value: "nav2_mppi_controller::MPPIController"
+        'FollowPath_DifferentialShimFast.prune_distance':
+          type: Double
+          value: 1.7
+        'FollowPath_DifferentialShimFast.regenerate_noises':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShimFast.retry_attempt_limit':
+          type: Integer
+          value: 1
+        'FollowPath_DifferentialShimFast.rotate_to_goal_heading':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShimFast.rotate_to_heading_angular_vel':
+          type: Double
+          value: 1.8
+        'FollowPath_DifferentialShimFast.rotate_to_heading_once':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShimFast.simulate_ahead_time':
+          type: Double
+          value: 1.0
+        'FollowPath_DifferentialShimFast.temperature':
+          type: Double
+          value: 0.3
+        'FollowPath_DifferentialShimFast.time_steps':
+          type: Integer
+          value: 56
+        'FollowPath_DifferentialShimFast.transform_tolerance':
+          type: Double
+          value: 0.1
+        'FollowPath_DifferentialShimFast.use_path_orientations':
+          type: Boolean
+          value: false
+        'FollowPath_DifferentialShimFast.visualize':
+          type: Boolean
+          value: true
+        'FollowPath_DifferentialShimFast.vx_max':
+          type: Double
+          value: 1.1
+        'FollowPath_DifferentialShimFast.vx_min':
+          type: Double
+          value: -1.1
+        'FollowPath_DifferentialShimFast.vx_std':
+          type: Double
+          value: 0.25
+        'FollowPath_DifferentialShimFast.vy_max':
+          type: Double
+          value: 0.0
+        'FollowPath_DifferentialShimFast.vy_std':
+          type: Double
+          value: 0.2
+        'FollowPath_DifferentialShimFast.wz_max':
+          type: Double
+          value: 1.0
+        'FollowPath_DifferentialShimFast.wz_std':
+          type: Double
+          value: 0.3
+        'action_server_result_timeout':
+          type: Double
+          value: 10.0
+        'autostart_node':
+          type: Boolean
+          value: false
+        'bond_heartbeat_period':
+          type: Double
+          value: 0.1
+        'controller_frequency':
+          type: Double
+          value: 10.0
+        'controller_plugins':
+          type: Array[String]
+          value: ['FollowPath_DifferentialShim', 'FollowPath', 'FollowPath_DifferentialShimFast']
+        'controller_server.verbose':
+          type: Boolean
+          value: false
+        'costmap_update_timeout':
+          type: Double
+          value: 0.3
+        'enable_stamped_cmd_vel':
+          type: Boolean
+          value: false
+        'failure_tolerance':
+          type: Double
+          value: 0.0
+        'general_goal_checker.plugin':
+          type: String
+          value: "nav2_controller::SimpleGoalChecker"
+        'general_goal_checker.stateful':
+          type: Boolean
+          value: true
+        'general_goal_checker.symmetric_yaw_tolerance':
+          type: Boolean
+          value: false
+        'general_goal_checker.xy_goal_tolerance':
+          type: Double
+          value: 0.05
+        'general_goal_checker.yaw_goal_tolerance':
+          type: Double
+          value: 0.05
+        'goal_checker_plugins':
+          type: Array[String]
+          value: ['general_goal_checker']
+        'min_theta_velocity_threshold':
+          type: Double
+          value: 0.0001
+        'min_x_velocity_threshold':
+          type: Double
+          value: 0.0001
+        'min_y_velocity_threshold':
+          type: Double
+          value: 0.0001
+        'odom_topic':
+          type: String
+          value: "odom"
+        'progress_checker.movement_time_allowance':
+          type: Double
+          value: 10.0
+        'progress_checker.plugin':
+          type: String
+          value: "nav2_controller::PoseProgressChecker"
+        'progress_checker.required_movement_angle':
+          type: Double
+          value: 0.5
+        'progress_checker.required_movement_radius':
+          type: Double
+          value: 0.5
+        'progress_checker_plugins':
+          type: Array[String]
+          value: ['progress_checker']
+        'publish_zero_velocity':
+          type: Boolean
+          value: true
+        'speed_limit_topic':
+          type: String
+          value: "speed_limit"
+        'start_type_description_service':
+          type: Boolean
+          value: true
+        'use_realtime_priority':
+          type: Boolean
+          value: false
+        'use_sim_time':
+          type: Boolean
+          value: false

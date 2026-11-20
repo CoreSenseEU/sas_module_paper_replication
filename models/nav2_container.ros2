@@ -1,0 +1,7 @@
+rclcpp_components:
+  artifacts:
+    component_container_isolated:
+      node: nav2_container
+      serviceservers:
+        'nav2_container/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'

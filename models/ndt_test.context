@@ -1,0 +1,105 @@
+import "ndt_testbed.rossystem";
+import "common_msgs.ros";
+import "people_msgs.ros";
+
+Environmental
+{ 
+ContextVariable current_velocity
+{     
+source: origin: publisher: _slash_ros_bridge.odometry_slash_filtered
+type: float32
+cache? false
+function_name "calc_linear_velocity"
+}
+
+ContextVariable current_room
+{     
+source: origin: publisher: global_costmap_slash_global_costmap.current_room
+type: string
+cache? false
+function_name "get_data_field"
+}
+
+ContextVariable risk_score
+{
+source: origin: publisher: _slash_riskam_node.riskam_slash_risk_score
+type: float32
+cache? false
+function_name "get_data_field"
+function_args "score"
+}
+
+ContextVariable angle_between_motion_and_camera
+{
+source: origin: publisher: _slash_ros_bridge.odometry_slash_filtered
+type: float32
+cache? false
+function_name "orientation_vs_motion"
+function_args "base_link,camera_link"
+}
+
+ContextVariable lastPerson
+{
+source: origin: publisher: people_estimation.people
+type: float32
+cache? false
+function_name meta_last_published
+function_args "people_not_empty"
+}
+
+ContextVariable current_pose
+{     
+source: origin: publisher: amcl.amcl_pose
+type: PoseWithCovarianceStamped
+cache? false
+function_name "get_data_field"
+function_args "pose"
+}
+
+ContextVariable moving
+{     
+source: origin: publisher: _slash_ros_bridge.odometry_slash_filtered
+type: bool
+cache? false
+function_name "is_moving"
+}
+
+ContextVariable persons
+{
+source: origin: publisher: people_estimation.people
+type: Person[]
+cache? false
+function_name "get_data_field"
+function_args "people"
+}
+
+ContextVariable distance_to_nearest_person
+{
+source: origin: current_pose persons
+type: float32
+cache? false
+function_name "distance_to_nearest_person"
+}
+
+ContextVariable moving_backward
+{
+source: origin: publisher: _slash_ros_bridge.odometry_slash_filtered
+type: bool
+cache? false
+function_name "is_moving_backward"
+}
+
+ContextVariable lastRearScan
+{
+source: origin: publisher: _slash_ros_bridge.rear_slash_scan
+type: float32
+cache? false
+function_name meta_last_published
+function_args ""
+}
+
+
+}
+Mission-Related
+{
+}

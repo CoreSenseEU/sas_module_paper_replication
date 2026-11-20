@@ -1,0 +1,18 @@
+ur_robot_driver:
+  artifacts:
+    controller_stopper_node:
+      node: /controller_stopper
+      subscribers:
+        'io_and_status_controller/robot_program_running':
+          type: 'std_msgs/msg/Bool'
+        'io_and_status_controller/robot_program_running':
+          type: 'std_msgs/msg/Bool'
+        'io_and_status_controller/robot_program_running':
+          type: 'std_msgs/msg/Bool'
+        'io_and_status_controller/robot_program_running':
+          type: 'std_msgs/msg/Bool'
+        'io_and_status_controller/robot_program_running':
+          type: 'std_msgs/msg/Bool'
+      serviceservers:
+        'controller_stopper/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'

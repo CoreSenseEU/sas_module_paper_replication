@@ -1,0 +1,57 @@
+ur_robot_driver:
+  artifacts:
+    dashboard_client:
+      node: /dashboard_client
+      serviceservers:
+        'dashboard_client/add_to_log':
+          type: 'ur_dashboard_msgs/srv/AddToLog'
+        'dashboard_client/brake_release':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/clear_operational_mode':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/close_popup':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/close_safety_popup':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/connect':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/get_loaded_program':
+          type: 'ur_dashboard_msgs/srv/GetLoadedProgram'
+        'dashboard_client/get_robot_mode':
+          type: 'ur_dashboard_msgs/srv/GetRobotMode'
+        'dashboard_client/get_safety_mode':
+          type: 'ur_dashboard_msgs/srv/GetSafetyMode'
+        'dashboard_client/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'
+        'dashboard_client/load_installation':
+          type: 'ur_dashboard_msgs/srv/Load'
+        'dashboard_client/load_program':
+          type: 'ur_dashboard_msgs/srv/Load'
+        'dashboard_client/pause':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/play':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/popup':
+          type: 'ur_dashboard_msgs/srv/Popup'
+        'dashboard_client/power_off':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/power_on':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/program_running':
+          type: 'ur_dashboard_msgs/srv/IsProgramRunning'
+        'dashboard_client/program_saved':
+          type: 'ur_dashboard_msgs/srv/IsProgramSaved'
+        'dashboard_client/program_state':
+          type: 'ur_dashboard_msgs/srv/GetProgramState'
+        'dashboard_client/quit':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/raw_request':
+          type: 'ur_dashboard_msgs/srv/RawRequest'
+        'dashboard_client/restart_safety':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/shutdown':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/stop':
+          type: 'std_srvs/srv/Trigger'
+        'dashboard_client/unlock_protective_stop':
+          type: 'std_srvs/srv/Trigger'

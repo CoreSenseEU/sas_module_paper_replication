@@ -1,0 +1,402 @@
+nav2_msgs:
+  msgs:
+    BehaviorTreeLog
+        message
+            "builtin_interfaces/msg/Time" timestamp
+            "nav2_msgs/msg/BehaviorTreeStatusChange"[] event_log
+    BehaviorTreeStatusChange
+        message
+            "builtin_interfaces/msg/Time" timestamp
+            string node_name
+            uint16 uid
+            string previous_status
+            string current_status
+    CollisionDetectorState
+        message
+            string[] polygons
+            bool[] detections
+    CollisionMonitorState
+        message
+            uint8 action_type
+            string polygon_name
+    Costmap
+        message
+            "std_msgs/msg/Header" header
+            "nav2_msgs/msg/CostmapMetaData" metadata
+            uint8[] data
+    CostmapFilterInfo
+        message
+            "std_msgs/msg/Header" header
+            uint8 type
+            string filter_mask_topic
+            float32 base
+            float32 multiplier
+    CostmapMetaData
+        message
+            "builtin_interfaces/msg/Time" map_load_time
+            "builtin_interfaces/msg/Time" update_time
+            string layer
+            float32 resolution
+            uint32 size_x
+            uint32 size_y
+            "geometry_msgs/msg/Pose" origin
+    CostmapUpdate
+        message
+            "std_msgs/msg/Header" header
+            uint32 x
+            uint32 y
+            uint32 size_x
+            uint32 size_y
+            uint8[] data
+    EdgeCost
+        message
+            uint16 edgeid
+            float32 cost
+    MissedWaypoint
+        message
+            uint32 index
+            "geometry_msgs/msg/PoseStamped" goal
+            uint16 error_code
+    Particle
+        message
+            "geometry_msgs/msg/Pose" pose
+            float64 weight
+    ParticleCloud
+        message
+            "std_msgs/msg/Header" header
+            "nav2_msgs/msg/Particle"[] particles
+    Route
+        message
+            "std_msgs/msg/Header" header
+            float32 route_cost
+            "nav2_msgs/msg/RouteNode"[] nodes
+            "nav2_msgs/msg/RouteEdge"[] edges
+    RouteEdge
+        message
+            uint16 edgeid
+            "geometry_msgs/msg/Point" start
+            "geometry_msgs/msg/Point" end
+    RouteNode
+        message
+            uint16 nodeid
+            "geometry_msgs/msg/Point" position
+    SpeedLimit
+        message
+            "std_msgs/msg/Header" header
+            bool percentage
+            float64 speed_limit
+    VoxelGrid
+        message
+            "std_msgs/msg/Header" header
+            uint32[] data
+            "geometry_msgs/msg/Point32" origin
+            "geometry_msgs/msg/Vector3" resolutions
+            uint32 size_x
+            uint32 size_y
+            uint32 size_z
+  srvs:
+    ClearCostmapAroundPose
+        request
+            "geometry_msgs/msg/PoseStamped" pose
+            float64 reset_distance
+        response
+            "std_msgs/msg/Empty" "response"
+    ClearCostmapAroundRobot
+        request
+            float32 reset_distance
+        response
+            "std_msgs/msg/Empty" "response"
+    ClearCostmapExceptRegion
+        request
+            float32 reset_distance
+        response
+            "std_msgs/msg/Empty" "response"
+    ClearEntireCostmap
+        request
+            "std_msgs/msg/Empty" "request"
+        response
+            "std_msgs/msg/Empty" "response"
+    DynamicEdges
+        request
+            uint16[] closed_edges
+            uint16[] opened_edges
+            "nav2_msgs/msg/EdgeCost"[] adjust_edges
+        response
+            bool success
+    GetCost
+        request
+            bool use_footprint
+            float32 x
+            float32 y
+            float32 theta
+        response
+            float32 cost
+    GetCostmap
+        request
+            "nav2_msgs/msg/CostmapMetaData" specs
+        response
+            "nav2_msgs/msg/Costmap" map
+    IsPathValid
+        request
+            "nav_msgs/msg/Path" path
+        response
+            bool is_valid
+            int32[] invalid_pose_indices
+    LoadMap
+        request
+            string map_url
+        response
+            "nav_msgs/msg/OccupancyGrid" map
+            uint8 result
+    ManageLifecycleNodes
+        request
+            uint8 command
+        response
+            bool success
+    ReloadDockDatabase
+        request
+            string filepath
+        response
+            bool success
+    SaveMap
+        request
+            string map_topic
+            string map_url
+            string image_format
+            string map_mode
+            float32 free_thresh
+            float32 occupied_thresh
+        response
+            bool result
+    SetInitialPose
+        request
+            "geometry_msgs/msg/PoseWithCovarianceStamped" pose
+        response
+    SetRouteGraph
+        request
+            string graph_filepath
+        response
+            bool success
+    Toggle
+        request
+            bool enable
+        response
+            bool success
+            string message
+  actions:
+    AssistedTeleop
+        goal
+            "builtin_interfaces/msg/Duration" time_allowance
+        result
+            "builtin_interfaces/msg/Duration" total_elapsed_time
+            uint16 error_code
+            string error_msg
+        feedback
+            "builtin_interfaces/msg/Duration" current_teleop_duration
+    BackUp
+        goal
+            "geometry_msgs/msg/Point" target
+            float32 speed
+            "builtin_interfaces/msg/Duration" time_allowance
+        result
+            "builtin_interfaces/msg/Duration" total_elapsed_time
+            uint16 error_code
+            string error_msg
+        feedback
+            float32 distance_traveled
+    ComputeAndTrackRoute
+        goal
+            uint16 start_id
+            "geometry_msgs/msg/PoseStamped" start
+            uint16 goal_id
+            "geometry_msgs/msg/PoseStamped" goal
+            bool use_start
+            bool use_poses
+        result
+            "builtin_interfaces/msg/Duration" execution_duration
+            uint16 error_code
+        feedback
+            uint16 last_node_id
+            uint16 next_node_id
+            uint16 current_edge_id
+            "nav2_msgs/msg/Route" route
+            "nav_msgs/msg/Path" path
+            string[] operations_triggered
+            bool rerouted
+    ComputePathThroughPoses
+        goal
+            "geometry_msgs/msg/PoseStamped"[] goals
+            "geometry_msgs/msg/PoseStamped" start
+            string planner_id
+            bool use_start
+        result
+            "nav_msgs/msg/Path" path
+            "builtin_interfaces/msg/Duration" planning_time
+            uint16 error_code
+            string error_msg
+        feedback
+    ComputePathToPose
+        goal
+            "geometry_msgs/msg/PoseStamped" goal
+            "geometry_msgs/msg/PoseStamped" start
+            string planner_id
+            bool use_start
+        result
+            "nav_msgs/msg/Path" path
+            "builtin_interfaces/msg/Duration" planning_time
+            uint16 error_code
+            string error_msg
+        feedback
+    ComputeRoute
+        goal
+            uint16 start_id
+            "geometry_msgs/msg/PoseStamped" start
+            uint16 goal_id
+            "geometry_msgs/msg/PoseStamped" goal
+            bool use_start
+            bool use_poses
+        result
+            "builtin_interfaces/msg/Duration" planning_time
+            "nav_msgs/msg/Path" path
+            "nav2_msgs/msg/Route" route
+            uint16 error_code
+        feedback
+    DockRobot
+        goal
+            bool use_dock_id
+            string dock_id
+            "geometry_msgs/msg/PoseStamped" dock_pose
+            string dock_type
+            float32 max_staging_time
+            bool navigate_to_staging_pose
+        result
+            bool success
+            uint16 error_code
+            uint16 num_retries
+            string error_msg
+        feedback
+            uint16 state
+            "builtin_interfaces/msg/Duration" docking_time
+            uint16 num_retries
+    DriveOnHeading
+        goal
+            "geometry_msgs/msg/Point" target
+            float32 speed
+            "builtin_interfaces/msg/Duration" time_allowance
+        result
+            "builtin_interfaces/msg/Duration" total_elapsed_time
+            uint16 error_code
+            string error_msg
+        feedback
+            float32 distance_traveled
+    DummyBehavior
+        goal
+            "std_msgs/msg/String" command
+        result
+            "builtin_interfaces/msg/Duration" total_elapsed_time
+            uint16 error_code
+            string error_msg
+        feedback
+    FollowGPSWaypoints
+        goal
+            uint32 number_of_loops
+            uint32 goal_index
+            "geographic_msgs/msg/GeoPose"[] gps_poses
+        result
+            "nav2_msgs/msg/MissedWaypoint"[] missed_waypoints
+            int16 error_code
+            string error_msg
+        feedback
+            uint32 current_waypoint
+    FollowPath
+        goal
+            "nav_msgs/msg/Path" path
+            string controller_id
+            string goal_checker_id
+            string progress_checker_id
+        result
+            "std_msgs/msg/Empty" result
+            uint16 error_code
+            string error_msg
+        feedback
+            float32 distance_to_goal
+            float32 speed
+    FollowWaypoints
+        goal
+            uint32 number_of_loops
+            uint32 goal_index
+            "geometry_msgs/msg/PoseStamped"[] poses
+        result
+            "nav2_msgs/msg/MissedWaypoint"[] missed_waypoints
+            uint16 error_code
+            string error_msg
+        feedback
+            uint32 current_waypoint
+    NavigateThroughPoses
+        goal
+            "geometry_msgs/msg/PoseStamped"[] poses
+            string behavior_tree
+        result
+            uint16 error_code
+            string error_msg
+        feedback
+            "geometry_msgs/msg/PoseStamped" current_pose
+            "builtin_interfaces/msg/Duration" navigation_time
+            "builtin_interfaces/msg/Duration" estimated_time_remaining
+            int16 number_of_recoveries
+            float32 distance_remaining
+            int16 number_of_poses_remaining
+    NavigateToPose
+        goal
+            "geometry_msgs/msg/PoseStamped" pose
+            string behavior_tree
+        result
+            uint16 error_code
+            string error_msg
+        feedback
+            "geometry_msgs/msg/PoseStamped" current_pose
+            "builtin_interfaces/msg/Duration" navigation_time
+            "builtin_interfaces/msg/Duration" estimated_time_remaining
+            int16 number_of_recoveries
+            float32 distance_remaining
+    SmoothPath
+        goal
+            "nav_msgs/msg/Path" path
+            string smoother_id
+            "builtin_interfaces/msg/Duration" max_smoothing_duration
+            bool check_for_collisions
+        result
+            "nav_msgs/msg/Path" path
+            "builtin_interfaces/msg/Duration" smoothing_duration
+            bool was_completed
+            uint16 error_code
+            string error_msg
+        feedback
+    Spin
+        goal
+            float32 target_yaw
+            "builtin_interfaces/msg/Duration" time_allowance
+        result
+            "builtin_interfaces/msg/Duration" total_elapsed_time
+            uint16 error_code
+            string error_msg
+        feedback
+            float32 angular_distance_traveled
+    UndockRobot
+        goal
+            string dock_type
+            float32 max_undocking_time
+        result
+            bool success
+            uint16 error_code
+            string error_msg
+        feedback
+    Wait
+        goal
+            "builtin_interfaces/msg/Duration" time
+        result
+            "builtin_interfaces/msg/Duration" total_elapsed_time
+            uint16 error_code
+            string error_msg
+        feedback
+            "builtin_interfaces/msg/Duration" time_left

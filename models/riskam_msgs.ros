@@ -1,0 +1,6 @@
+riskam_msgs:
+  msgs:
+    FloatStamped
+      message
+       "std_msgs/msg/Header" header
+       float64 score

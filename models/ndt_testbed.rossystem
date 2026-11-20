@@ -1,0 +1,20 @@
+samxl:
+  nodes:
+    "/ros_bridge":
+      from: "ros_bridge.ros_bridge"
+    "/riskam_node":
+      from: "riskam.riskam_node"
+    "controller_server":
+      from: "nav2_controller.controller_server"
+    nav2_plugin_configurer:
+      from: "rem_tiago./nav2_plugin_configurer"
+    amcl:
+      from: "nav2_amcl.amcl"
+    "global_costmap/global_costmap":
+      from: "nav2_planner./global_costmap/global_costmap"
+      interfaces:
+      	- "global_costmap/current_room": pub-> "global_costmap::current_room" 
+    planner_server:
+      from: "nav2_planner.planner_server"
+    people_estimation:
+      from: "coresense_people_estimation.people_estimation"

@@ -1,0 +1,73 @@
+riskam:
+  artifacts:
+    riskam:
+      node: riskam_node
+      publishers:
+        'riskam/annotated_image':
+          type: 'sensor_msgs/msg/Image' 
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'riskam/depth':
+          type: 'riskam_msgs/msg/FloatStamped'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'riskam/gaze':
+          type: 'riskam_msgs/msg/FloatStamped'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'riskam/risk_score':
+          type: 'riskam_msgs/msg/FloatStamped'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'riskam/x_pose':
+          type: 'riskam_msgs/msg/FloatStamped'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+      subscribers:
+        'camera/realsense/color/image_raw':
+          type: 'sensor_msgs/msg/Image'
+      parameters:
+        'gamma':
+          type: Double
+          value: 0.5
+        'gaze_thresh':
+          type: Array[Double]
+          value: [0.1, 0.2]
+        'start_type_description_service': 
+          type: Boolean
+          value: true
+        'use_sim_time':
+          type: Boolean
+          value: false
+        'visualize_image':
+          type: Boolean
+          value: true
+        'w_gaze':
+          type: Double
+          value: 0.25
+        'w_position':
+          type: Double
+          value: 0.05
+        'w_proximity':
+          type: Double
+          value: 0.7

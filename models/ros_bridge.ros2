@@ -1,0 +1,133 @@
+ros_bridge:
+  artifacts:
+    ros_bridge:
+      node: ros_bridge
+      publishers:
+        'cmd_vel':
+          type: 'geometry_msgs/msg/Twist'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'front/scan':
+          type: 'sensor_msgs/msg/LaserScan'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'imu/data':
+          type: 'sensor_msgs/msg/Imu'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'imu/data_raw':
+          type: 'sensor_msgs/msg/Imu'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'joy_teleop/cmd_vel':
+          type: 'geometry_msgs/msg/Twist'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'merged_cloud':
+          type: 'sensor_msgs/msg/PointCloud2'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'odometry/filtered':
+          type: 'nav_msgs/msg/Odometry'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'rear/scan':
+          type: 'sensor_msgs/msg/LaserScan'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'ridgeback/joint_states':
+          type: 'sensor_msgs/msg/JointState'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'scan_multi':
+          type: 'sensor_msgs/msg/LaserScan'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'tf':
+          type: 'tf2_msgs/msg/TFMessage'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'tf_static':
+          type: 'tf2_msgs/msg/TFMessage'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+      subscribers:
+        'cmd_vel':
+          type: 'geometry_msgs/msg/Twist'
+        'front/scan':
+          type: 'sensor_msgs/msg/LaserScan'
+        'imu/data':
+          type: 'sensor_msgs/msg/Imu'
+        'imu/data_raw':
+          type: 'sensor_msgs/msg/Imu'
+        'joy_teleop/cmd_vel':
+          type: 'geometry_msgs/msg/Twist'
+        'merged_cloud':
+          type: 'sensor_msgs/msg/PointCloud2'
+        'odometry/filtered':
+          type: 'nav_msgs/msg/Odometry'
+        'rear/scan':
+          type: 'sensor_msgs/msg/LaserScan'
+        'ridgeback/joint_states':
+          type: 'sensor_msgs/msg/JointState'
+        'scan_multi':
+          type: 'sensor_msgs/msg/LaserScan'
+        'tf':
+          type: 'tf2_msgs/msg/TFMessage'
+        'tf_static':
+          type: 'tf2_msgs/msg/TFMessage'
+      parameters:
+        'start_type_description_service':
+          type: Boolean
+          value: true
+        'use_sim_time':
+          type: Boolean
+          value: false

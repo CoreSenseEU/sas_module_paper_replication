@@ -1,0 +1,5 @@
+import "ndt_testbed.var";
+[DetectHumans] CameraMotionAlignment, Safety: "Ensure the camera and motion of the robot are aligned", SHALL (AS MANY AS POSSIBLE (^ angle_between_motion_and_camera, FuzzyLeftShoulder(foot=0.52,shoulder=0.0))) 
+MoveSafely, Safety: "Try to keep distance from obstacles", SHALL (OR(NOT(^ moving),  AS MANY AS POSSIBLE (^ distance_to_nearest_person, FuzzyRightShoulder(foot=0.3,shoulder=2.0)))) 
+MoveQuickly, Performance efficiency: "Move as quickly as possible to 0.52 m/s", SHALL(AS CLOSE AS POSSIBLE TO (0.52, ^ current_velocity, FuzzyTriangular(-0.52, 0.0, 0.52)))
+SafeRearMovement, Safety: "The robot should only drive backwards with a working rear lidar", SHALL(NOT(AND(^ moving_backward, lastRearScan > 5)))

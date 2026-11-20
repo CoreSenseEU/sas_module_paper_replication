@@ -1,0 +1,86 @@
+name NDTTactics;
+import "ndt_testbed.resolution";
+import "ndt_test.context";
+import "nav2_msgs.ros";
+import "ndt_testbed.reqs";
+
+rule CAMERA {
+	guard {
+		context(current_room != "workcell")
+		features(!selected(ndt_testbed.DetectHumans))
+	}
+	action {
+		select_variant(ndt_testbed.DetectHumans)
+	}
+};
+
+rule SOCIALLAYER {
+		guard {
+			context(lastPerson < 5.0)
+			features(!selected(ndt_testbed.SocialLayer))
+		}
+		action {
+			select_variant(ndt_testbed.SocialLayer)
+		}
+};
+
+
+NavigateThroughPoses {
+	rule OMNIDRIVE {
+		guard {
+			context(current_room == "workcell")
+			features(!selected(ndt_testbed.MPPI_OMNI))
+		}
+		action {
+			select_variant(ndt_testbed.MPPI_OMNI) AND unselect_variant(ndt_testbed.DetectHumans)
+		}
+	};
+	rule LOWRISK {
+		guard {
+			context(current_room != "workcell" AND risk_score < 0.3)
+			features(!selected(ndt_testbed.HigherVelocity))
+		}
+		action {
+			select_variant(ndt_testbed.HigherVelocity)
+		}
+	};
+	rule HIRISK {
+		guard {
+			context(current_room != "workcell" AND risk_score > 0.4)
+			features(!selected(ndt_testbed.DefaultVelocity))
+		}
+		action {
+			select_variant(ndt_testbed.DefaultVelocity)
+		}
+	};
+}
+
+CameraMotionAlignment NavigateThroughPoses {
+	rule HALLWAY {
+	guard {
+	 	features(!selected(ndt_testbed.MPPI_DIFF)) 
+	 	}
+		action {
+			select_variant(ndt_testbed.MPPI_DIFF)
+		}
+	};
+}
+
+SafeRearMovement NavigateThroughPoses {
+	rule RECOVER {
+	guard {
+		features(!selected(ndt_testbed.RecoverLidar))
+		}
+	action {
+		select_variant(ndt_testbed.RecoverLidar)
+	}
+	};
+	rule SOME_RULE {
+	guard {
+		features(!selected(ndt_testbed.MPPI_DIFF) AND selected(ndt_testbed.HigherVelocity) OR selected(ndt_testbed.MPPI_OMNI))
+		}
+	action {
+		select_variant(ndt_testbed.RecoverLidar)
+	}
+	};
+}

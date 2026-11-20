@@ -1,0 +1,38 @@
+name ndt_testbed;
+import "ndt_testbed.rossystem";
+import "ndt_testbed.var";
+variability_model ndt_testbed;
+ros_system samxl;
+
+FunctionalMapping
+
+Reconfigurations 
+PrimaryController.MPPI_DIFF:
+select: SetParameter(nav2_plugin_configurer,selected_controller,"FollowPath_DifferentialShim") SetParameter(amcl,robot_model_type, "nav2_amcl::DifferentialMotionModel")
+deselect: 
+PrimaryController.MPPI_OMNI:
+select: SetParameter(nav2_plugin_configurer,selected_controller,"FollowPath") SetParameter(amcl,robot_model_type, "nav2_amcl::OmniMotionModel")
+deselect:
+MaximumVelocity.HigherVelocity:
+select:
+SetParameter(controller_server,FollowPath_DifferentialShim_dot_vx_std,0.25)
+SetParameter(controller_server,FollowPath_DifferentialShim_dot_vx_max,1.1)
+SetParameter(controller_server,FollowPath_DifferentialShim_dot_vx_min,-1.1)
+SetParameter(controller_server,FollowPath_DifferentialShim_dot_ax_max,25.0)
+SetParameter(controller_server,FollowPath_DifferentialShim_dot_ax_min,-10.0)
+deselect:
+MaximumVelocity.DefaultVelocity:
+select:
+SetParameter(controller_server,FollowPath_DifferentialShim_dot_vx_std,0.20)
+SetParameter(controller_server,FollowPath_DifferentialShim_dot_vx_max,0.5)
+SetParameter(controller_server,FollowPath_DifferentialShim_dot_vx_min,-0.35)
+SetParameter(controller_server,FollowPath_DifferentialShim_dot_ax_max,3.0)
+SetParameter(controller_server,FollowPath_DifferentialShim_dot_ax_min,-3.0)
+deselect:
+
+NDT.DetectHumans:
+select:
+deselect:
+GlobalCostmap.SocialLayer:
+select: SetParameter(global_costmap_slash_global_costmap, social_layer_dot_enabled, true)
+deselect: SetParameter(global_costmap_slash_global_costmap, social_layer_dot_enabled, false)

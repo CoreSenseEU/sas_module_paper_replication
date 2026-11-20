@@ -1,0 +1,637 @@
+realsense2_camera:
+  artifacts:
+    realsense2_camera_node:
+      node: realsense2_camera_node
+      publishers:
+        'realsense/accel/imu_info':
+          type: 'realsense2_camera_msgs/msg/IMUInfo'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'realsense/accel/metadata':
+          type: 'realsense2_camera_msgs/msg/Metadata'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'realsense/accel/sample':
+          type: 'sensor_msgs/msg/Imu'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: best_effort
+            durability: volatile
+        'realsense/color/camera_info':
+          type: 'sensor_msgs/msg/CameraInfo'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'realsense/color/image_raw':
+          type: 'sensor_msgs/msg/Image'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'realsense/color/metadata':
+          type: 'realsense2_camera_msgs/msg/Metadata'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'realsense/depth/camera_info':
+          type: 'sensor_msgs/msg/CameraInfo'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'realsense/depth/image_rect_raw':
+          type: 'sensor_msgs/msg/Image'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'realsense/depth/metadata':
+          type: 'realsense2_camera_msgs/msg/Metadata'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'realsense/extrinsics/depth_to_accel':
+          type: 'realsense2_camera_msgs/msg/Extrinsics'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'realsense/extrinsics/depth_to_color':
+          type: 'realsense2_camera_msgs/msg/Extrinsics'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'realsense/extrinsics/depth_to_gyro':
+          type: 'realsense2_camera_msgs/msg/Extrinsics'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'realsense/gyro/imu_info':
+          type: 'realsense2_camera_msgs/msg/IMUInfo'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+        'realsense/gyro/metadata':
+          type: 'realsense2_camera_msgs/msg/Metadata'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'realsense/gyro/sample':
+          type: 'sensor_msgs/msg/Imu'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: best_effort
+            durability: volatile
+        'ic':
+          type: 'tf2_msgs/msg/TFMessage'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: transient_local
+      actionservers:
+        'realsense/triggered_calibration':
+          type: 'realsense2_camera_msgs/action/TriggeredCalibration'
+      serviceservers:
+        'realsense/calib_config_read':
+          type: 'realsense2_camera_msgs/srv/CalibConfigRead'
+        'realsense/calib_config_write':
+          type: 'realsense2_camera_msgs/srv/CalibConfigWrite'
+        'realsense/device_info':
+          type: 'realsense2_camera_msgs/srv/DeviceInfo'
+        'realsense/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'
+        'realsense/hw_reset':
+          type: 'std_srvs/srv/Empty'
+      parameters:
+        '_device_type':
+          type: String
+          value: ""
+        '_usb_port_id':
+          type: String
+          value: ""
+        'accel_fps':
+          type: Integer
+          value: 100
+        'accel_info_qos':
+          type: String
+          value: "DEFAULT"
+        'accel_qos':
+          type: String
+          value: "SENSOR_DATA"
+        'align_depth.enable':
+          type: Boolean
+          value: false
+        'align_depth.frames_queue_size':
+          type: Integer
+          value: 16
+        'angular_velocity_cov':
+          type: Double
+          value: 0.01
+        'base_frame_id':
+          type: String
+          value: "link"
+        'camera_name':
+          type: String
+          value: "camera"
+        'clip_distance':
+          type: Double
+          value: -1.0
+        'color_info_qos':
+          type: String
+          value: "DEFAULT"
+        'color_qos':
+          type: String
+          value: "SYSTEM_DEFAULT"
+        'colorizer.color_scheme':
+          type: Integer
+          value: 0
+        'colorizer.enable':
+          type: Boolean
+          value: false
+        'colorizer.frames_queue_size':
+          type: Integer
+          value: 16
+        'colorizer.histogram_equalization_enabled':
+          type: Boolean
+          value: true
+        'colorizer.max_distance':
+          type: Double
+          value: 6.0
+        'colorizer.min_distance':
+          type: Double
+          value: 0.0
+        'colorizer.stream_filter':
+          type: Integer
+          value: 1
+        'colorizer.stream_format_filter':
+          type: Integer
+          value: 1
+        'colorizer.stream_index_filter':
+          type: Integer
+          value: -1
+        'colorizer.visual_preset':
+          type: Integer
+          value: 0
+        'decimation_filter.enable':
+          type: Boolean
+          value: false
+        'decimation_filter.filter_magnitude':
+          type: Integer
+          value: 2
+        'decimation_filter.frames_queue_size':
+          type: Integer
+          value: 16
+        'decimation_filter.stream_filter':
+          type: Integer
+          value: 1
+        'decimation_filter.stream_format_filter':
+          type: Integer
+          value: 1
+        'decimation_filter.stream_index_filter':
+          type: Integer
+          value: -1
+        'depth_info_qos':
+          type: String
+          value: "DEFAULT"
+        'depth_module.auto_exposure_limit':
+          type: Integer
+          value: 165000
+        'depth_module.auto_exposure_limit_toggle':
+          type: Boolean
+          value: false
+        'depth_module.auto_exposure_roi.bottom':
+          type: Integer
+          value: 479
+        'depth_module.auto_exposure_roi.left':
+          type: Integer
+          value: 0
+        'depth_module.auto_exposure_roi.right':
+          type: Integer
+          value: 847
+        'depth_module.auto_exposure_roi.top':
+          type: Integer
+          value: 0
+        'depth_module.auto_gain_limit':
+          type: Integer
+          value: 248
+        'depth_module.auto_gain_limit_toggle':
+          type: Boolean
+          value: false
+        'depth_module.depth_format':
+          type: String
+          value: "Z16"
+        'depth_module.depth_profile':
+          type: String
+          value: "848x480x30"
+        'depth_module.emitter_always_on':
+          type: Boolean
+          value: false
+        'depth_module.emitter_enabled':
+          type: Integer
+          value: 1
+        'depth_module.emitter_on_off':
+          type: Boolean
+          value: false
+        'depth_module.enable_auto_exposure':
+          type: Boolean
+          value: true
+        'depth_module.error_polling_enabled':
+          type: Boolean
+          value: true
+        'depth_module.exposure':
+          type: Integer
+          value: 8500
+        'depth_module.frames_queue_size':
+          type: Integer
+          value: 16
+        'depth_module.gain':
+          type: Integer
+          value: 16
+        'depth_module.global_time_enabled':
+          type: Boolean
+          value: true
+        'depth_module.hdr_enabled':
+          type: Boolean
+          value: false
+        'depth_module.infra1_format':
+          type: String
+          value: "Y8"
+        'depth_module.infra2_format':
+          type: String
+          value: "Y8"
+        'depth_module.infra_profile':
+          type: String
+          value: "848x480x30"
+        'depth_module.inter_cam_sync_mode':
+          type: Integer
+          value: 0
+        'depth_module.laser_power':
+          type: Double
+          value: 150.0
+        'depth_module.output_trigger_enabled':
+          type: Boolean
+          value: false
+        'depth_module.sequence_id':
+          type: Integer
+          value: 0
+        'depth_module.sequence_name':
+          type: Integer
+          value: 0
+        'depth_module.sequence_size':
+          type: Integer
+          value: 2
+        'depth_module.visual_preset':
+          type: Integer
+          value: 0
+        'depth_qos':
+          type: String
+          value: "SYSTEM_DEFAULT"
+        'diagnostics_period':
+          type: Double
+          value: 0.0
+        'disparity_filter.enable':
+          type: Boolean
+          value: false
+        'disparity_to_depth.enable':
+          type: Boolean
+          value: false
+        'enable_accel':
+          type: Boolean
+          value: true
+        'enable_color':
+          type: Boolean
+          value: true
+        'enable_depth':
+          type: Boolean
+          value: true
+        'enable_gyro':
+          type: Boolean
+          value: true
+        'enable_infra1':
+          type: Boolean
+          value: false
+        'enable_infra2':
+          type: Boolean
+          value: false
+        'enable_rgbd':
+          type: Boolean
+          value: false
+        'enable_sync':
+          type: Boolean
+          value: false
+        'filter_by_sequence_id.enable':
+          type: Boolean
+          value: false
+        'filter_by_sequence_id.frames_queue_size':
+          type: Integer
+          value: 16
+        'filter_by_sequence_id.sequence_id':
+          type: Integer
+          value: 1
+        'gyro_fps':
+          type: Integer
+          value: 200
+        'gyro_info_qos':
+          type: String
+          value: "DEFAULT"
+        'gyro_qos':
+          type: String
+          value: "SENSOR_DATA"
+        'hdr_merge.enable':
+          type: Boolean
+          value: false
+        'hdr_merge.frames_queue_size':
+          type: Integer
+          value: 16
+        'hold_back_imu_for_frames':
+          type: Boolean
+          value: false
+        'hole_filling_filter.enable':
+          type: Boolean
+          value: false
+        'hole_filling_filter.frames_queue_size':
+          type: Integer
+          value: 16
+        'hole_filling_filter.holes_fill':
+          type: Integer
+          value: 1
+        'hole_filling_filter.stream_filter':
+          type: Integer
+          value: 1
+        'hole_filling_filter.stream_format_filter':
+          type: Integer
+          value: 1
+        'hole_filling_filter.stream_index_filter':
+          type: Integer
+          value: -1
+        'infra1_info_qos':
+          type: String
+          value: "DEFAULT"
+        'infra1_qos':
+          type: String
+          value: "SYSTEM_DEFAULT"
+        'infra2_info_qos':
+          type: String
+          value: "DEFAULT"
+        'infra2_qos':
+          type: String
+          value: "SYSTEM_DEFAULT"
+        'initial_reset':
+          type: Boolean
+          value: false
+        'json_file_path':
+          type: String
+          value: ""
+        'linear_accel_cov':
+          type: Double
+          value: 0.01
+        'motion_module.enable_motion_correction':
+          type: Boolean
+          value: true
+        'motion_module.frames_queue_size':
+          type: Integer
+          value: 16
+        'motion_module.global_time_enabled':
+          type: Boolean
+          value: true
+        'motion_module.gyro_sensitivity':
+          type: Integer
+          value: 1
+        'pointcloud.allow_no_texture_points':
+          type: Boolean
+          value: false
+        'pointcloud.enable':
+          type: Boolean
+          value: false
+        'pointcloud.filter_magnitude':
+          type: Integer
+          value: 2
+        'pointcloud.frames_queue_size':
+          type: Integer
+          value: 16
+        'pointcloud.ordered_pc':
+          type: Boolean
+          value: false
+        'pointcloud.pointcloud_qos':
+          type: String
+          value: "DEFAULT"
+        'pointcloud.stream_filter':
+          type: Integer
+          value: 0
+        'pointcloud.stream_format_filter':
+          type: Integer
+          value: 0
+        'pointcloud.stream_index_filter':
+          type: Integer
+          value: -1
+        'publish_tf':
+          type: Boolean
+          value: true
+        'realsense.color.image_raw.enable_pub_plugins':
+          type: Array[String]
+          value: ['image_transport/raw']
+        'realsense.depth.image_rect_raw.enable_pub_plugins':
+          type: Array[String]
+          value: ['image_transport/raw']
+        'reconnect_timeout':
+          type: Double
+          value: 6.0
+        'rgb_camera.auto_exposure_priority':
+          type: Boolean
+          value: false
+        'rgb_camera.auto_exposure_roi.bottom':
+          type: Integer
+          value: 479
+        'rgb_camera.auto_exposure_roi.left':
+          type: Integer
+          value: 0
+        'rgb_camera.auto_exposure_roi.right':
+          type: Integer
+          value: 639
+        'rgb_camera.auto_exposure_roi.top':
+          type: Integer
+          value: 0
+        'rgb_camera.backlight_compensation':
+          type: Boolean
+          value: false
+        'rgb_camera.brightness':
+          type: Integer
+          value: 0
+        'rgb_camera.color_format':
+          type: String
+          value: "RGB8"
+        'rgb_camera.color_profile':
+          type: String
+          value: "640x480x15"
+        'rgb_camera.contrast':
+          type: Integer
+          value: 50
+        'rgb_camera.enable_auto_exposure':
+          type: Boolean
+          value: true
+        'rgb_camera.enable_auto_white_balance':
+          type: Boolean
+          value: true
+        'rgb_camera.exposure':
+          type: Integer
+          value: 166
+        'rgb_camera.frames_queue_size':
+          type: Integer
+          value: 16
+        'rgb_camera.gain':
+          type: Integer
+          value: 64
+        'rgb_camera.gamma':
+          type: Integer
+          value: 300
+        'rgb_camera.global_time_enabled':
+          type: Boolean
+          value: true
+        'rgb_camera.hue':
+          type: Integer
+          value: 0
+        'rgb_camera.power_line_frequency':
+          type: Integer
+          value: 3
+        'rgb_camera.saturation':
+          type: Integer
+          value: 64
+        'rgb_camera.sharpness':
+          type: Integer
+          value: 50
+        'rgb_camera.white_balance':
+          type: Double
+          value: 4600.0
+        'rosbag_filename':
+          type: String
+          value: ""
+        'rotation_filter.enable':
+          type: Boolean
+          value: false
+        'rotation_filter.frames_queue_size':
+          type: Integer
+          value: 16
+        'rotation_filter.rotation':
+          type: Double
+          value: 0.0
+        'rotation_filter.stream_filter':
+          type: Integer
+          value: 0
+        'rotation_filter.stream_format_filter':
+          type: Integer
+          value: 0
+        'rotation_filter.stream_index_filter':
+          type: Integer
+          value: -1
+        'serial_no':
+          type: String
+          value: ""
+        'spatial_filter.enable':
+          type: Boolean
+          value: false
+        'spatial_filter.filter_magnitude':
+          type: Integer
+          value: 2
+        'spatial_filter.filter_smooth_alpha':
+          type: Double
+          value: 0.5
+        'spatial_filter.filter_smooth_delta':
+          type: Integer
+          value: 20
+        'spatial_filter.frames_queue_size':
+          type: Integer
+          value: 16
+        'spatial_filter.holes_fill':
+          type: Integer
+          value: 0
+        'spatial_filter.stream_filter':
+          type: Integer
+          value: 1
+        'spatial_filter.stream_format_filter':
+          type: Integer
+          value: 1
+        'spatial_filter.stream_index_filter':
+          type: Integer
+          value: -1
+        'start_type_description_service':
+          type: Boolean
+          value: true
+        'temporal_filter.enable':
+          type: Boolean
+          value: false
+        'temporal_filter.filter_smooth_alpha':
+          type: Double
+          value: 0.4
+        'temporal_filter.filter_smooth_delta':
+          type: Integer
+          value: 20
+        'temporal_filter.frames_queue_size':
+          type: Integer
+          value: 16
+        'temporal_filter.holes_fill':
+          type: Integer
+          value: 3
+        'temporal_filter.stream_filter':
+          type: Integer
+          value: 1
+        'temporal_filter.stream_format_filter':
+          type: Integer
+          value: 1
+        'temporal_filter.stream_index_filter':
+          type: Integer
+          value: -1
+        'tf_publish_rate':
+          type: Double
+          value: 0.0
+        'unite_imu_method':
+          type: Integer
+          value: 0
+        'use_sim_time':
+          type: Boolean
+          value: false
+        'wait_for_device_timeout':
+          type: Double
+          value: -1.0

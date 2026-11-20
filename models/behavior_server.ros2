@@ -1,0 +1,154 @@
+nav2_behaviors:
+  artifacts:
+    behavior_server:
+      node: behavior_server
+      publishers:
+        'behavior_server/transition_event':
+          type: 'lifecycle_msgs/msg/TransitionEvent'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'bond':
+          type: 'bond/msg/Status'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+        'cmd_vel_nav':
+          type: 'geometry_msgs/msg/Twist'
+          qos:
+          # profile:
+          # history: UNKNOWN
+          # depth:
+            reliability: reliable
+            durability: volatile
+      subscribers:
+        'bond':
+          type: 'bond/msg/Status'
+        'cmd_vel_teleop':
+          type: 'geometry_msgs/msg/Twist'
+        'local_costmap/costmap_raw':
+          type: 'nav2_msgs/msg/Costmap'
+        'local_costmap/costmap_raw_updates':
+          type: 'nav2_msgs/msg/CostmapUpdate'
+        'local_costmap/published_footprint':
+          type: 'geometry_msgs/msg/PolygonStamped'
+        'preempt_teleop':
+          type: 'std_msgs/msg/Empty'
+      actionservers:
+        'assisted_teleop':
+          type: 'nav2_msgs/action/AssistedTeleop'
+        'backup':
+          type: 'nav2_msgs/action/BackUp'
+        'drive_on_heading':
+          type: 'nav2_msgs/action/DriveOnHeading'
+        'spin':
+          type: 'nav2_msgs/action/Spin'
+        'wait':
+          type: 'nav2_msgs/action/Wait'
+      serviceservers:
+        'behavior_server/change_state':
+          type: 'lifecycle_msgs/srv/ChangeState'
+        'behavior_server/get_available_states':
+          type: 'lifecycle_msgs/srv/GetAvailableStates'
+        'behavior_server/get_available_transitions':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'behavior_server/get_state':
+          type: 'lifecycle_msgs/srv/GetState'
+        'behavior_server/get_transition_graph':
+          type: 'lifecycle_msgs/srv/GetAvailableTransitions'
+        'behavior_server/get_type_description':
+          type: 'type_description_interfaces/srv/GetTypeDescription'
+      parameters:
+        '/bond_disable_heartbeat_timeout':
+          type: Boolean
+          value: true
+        'action_server_result_timeout':
+          type: Double
+          value: 10.0
+        'assisted_teleop.plugin':
+          type: String
+          value: "nav2_behaviors::AssistedTeleop"
+        'autostart_node':
+          type: Boolean
+          value: false
+        'backup.plugin':
+          type: String
+          value: "nav2_behaviors::BackUp"
+        'behavior_plugins':
+          type: Array[String]
+          value: ['spin', 'backup', 'drive_on_heading', 'assisted_teleop', 'wait']
+        'bond_heartbeat_period':
+          type: Double
+          value: 0.1
+        'cmd_vel_teleop':
+          type: String
+          value: "cmd_vel_teleop"
+        'cycle_frequency':
+          type: Double
+          value: 10.0
+        'drive_on_heading.plugin':
+          type: String
+          value: "nav2_behaviors::DriveOnHeading"
+        'enable_stamped_cmd_vel':
+          type: Boolean
+          value: false
+        'global_costmap_topic':
+          type: String
+          value: "global_costmap/costmap_raw"
+        'global_footprint_topic':
+          type: String
+          value: "global_costmap/published_footprint"
+        'global_frame':
+          type: String
+          value: "odom"
+        'local_costmap_topic':
+          type: String
+          value: "local_costmap/costmap_raw"
+        'local_footprint_topic':
+          type: String
+          value: "local_costmap/published_footprint"
+        'local_frame':
+          type: String
+          value: "odom"
+        'max_rotational_vel':
+          type: Double
+          value: 1.0
+        'min_rotational_vel':
+          type: Double
+          value: 0.4
+        'projection_time':
+          type: Double
+          value: 1.0
+        'robot_base_frame':
+          type: String
+          value: "base_link"
+        'rotational_acc_lim':
+          type: Double
+          value: 3.2
+        'simulate_ahead_time':
+          type: Double
+          value: 2.0
+        'simulation_time_step':
+          type: Double
+          value: 0.1
+        'spin.plugin':
+          type: String
+          value: "nav2_behaviors::Spin"
+        'start_type_description_service':
+          type: Boolean
+          value: true
+        'transform_tolerance':
+          type: Double
+          value: 0.1
+        'use_sim_time':
+          type: Boolean
+          value: false
+        'wait.plugin':
+          type: String
+          value: "nav2_behaviors::Wait"
