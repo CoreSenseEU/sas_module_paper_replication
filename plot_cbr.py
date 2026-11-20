@@ -6,6 +6,7 @@ from rosbags.highlevel import AnyReader
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.stats import mannwhitneyu
 
 
 def just_this_requirement(req_list, req_name):
@@ -81,15 +82,30 @@ def plot_bag(bag_path, req_names, title, cmd_vel_tolerance=1e-6):
                 # config_change_times.append(t_sec)
                 # config_change_labels.append(str("param_event"))
 
+    translation_singular = {
+        "{'HigherVelocity'}" : "Maximum velocity set to increased",
+        "{'SocialLayer'}" : "Social costmap layer activated",
+        "{'MPPI_DIFF'}" : "Robot motion model set to differential drive",
+        "{'MPPI_OMNI'}" : "Robot motion model set to omnidirectional drive",
+        "{'DetectHumans'}" : "People detection activated",
+        "{'DefaultVelocity'}" : "Maximum velocity set to default",
+        "{'RecoverLidar'}" : "Attempt recovery of broken LiDAR sensor"
+    }
 
+    translation_double = {
+        "{'HigherVelocity', 'DetectHumans'}" : translation_singular["{'HigherVelocity'}"] + " and " + translation_singular["{'DetectHumans'}"],
+        "{'DetectHumans', 'HigherVelocity'}" : translation_singular["{'HigherVelocity'}"] + " and " + translation_singular["{'DetectHumans'}"],
+    }
 
+    translation_double.update(translation_singular)
     mapping_lines = [
         line
-        for i, text in enumerate(config_change_labels, start=1)
+        for i, (t_change, text) in enumerate(zip(config_change_times, config_change_labels), start=1)
         for line in textwrap.wrap(
-            f"{i}: Select{text}", width=34, subsequent_indent="   "
+            f"{i}: {translation_double[text]} ({t_change:.1f} s)", width=34, subsequent_indent="   "
         )
     ]
+
     fig_height = max(5, 2 + 0.22 * len(mapping_lines))
     fig = plt.figure(figsize=(11, fig_height), constrained_layout=True)
     grid = fig.add_gridspec(1, 2, width_ratios=[4, 2])
@@ -145,39 +161,20 @@ def plot_bag(bag_path, req_names, title, cmd_vel_tolerance=1e-6):
     return fig, run_means, u_rear_means
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Plot the requirements topics from each bag directory in a folder."
-    )
-    parser.add_argument("folder", type=Path, help="Folder containing timestamp-named bag directories")
-    parser.add_argument(
-        "--cmd-vel-tolerance",
-        type=float,
-        default=1e-6,
-        help="Absolute component threshold for treating /cmd_vel as nonzero (default: 1e-6)",
-    )
-    args = parser.parse_args()
-
-    if not args.folder.is_dir():
-        parser.error(f"not a folder: {args.folder}")
-    if args.cmd_vel_tolerance < 0:
-        parser.error("--cmd-vel-tolerance must be non-negative")
-
-    bag_paths = sorted(path for path in args.folder.iterdir() if path.is_dir())
+def process_folder(folder, req_names, title, cmd_vel_tolerance):
+    """Plot every bag in `folder`, write its tables, and return the per-run U values."""
+    bag_paths = sorted(path for path in folder.iterdir() if path.is_dir())
     if not bag_paths:
-        parser.error(f"no bag directories found in: {args.folder}")
+        raise SystemExit(f"no bag directories found in: {folder}")
 
-    title = input("What title should the plots have? > ")
-
-    req_names = ["SafeRearMovement"]
     run_means = {}
     u_rear_means = {}
 
     for bag_path in bag_paths:
         fig, run_means[bag_path.name], u_rear_means[bag_path.name] = plot_bag(
-            bag_path, req_names, title, cmd_vel_tolerance=args.cmd_vel_tolerance
+            bag_path, req_names, title, cmd_vel_tolerance=cmd_vel_tolerance
         )
-        output_path = args.folder / f"{bag_path.name}.pdf"
+        output_path = folder / f"{bag_path.name}.pdf"
         fig.savefig(output_path, format="pdf")
         plt.close(fig)
         print(f"Saved {output_path}")
@@ -186,17 +183,17 @@ def main():
     u_rear_df = pd.DataFrame.from_dict(u_rear_means, orient="index")
     summary_df = pd.DataFrame({
         "Mean satisfaction": run_means_df.mean(axis=0),
-        "Mean U Satisfaction": u_rear_df.mean(axis=0), 
+        "Mean U Satisfaction": u_rear_df.mean(axis=0),
         "Runs averaged": run_means_df.count(axis=0),
     }).rename_axis("Requirement")
-    table_path = args.folder / "mean_satisfaction.txt"
+    table_path = folder / "mean_satisfaction.txt"
     table_path.write_text(
         summary_df.to_latex(float_format="%.3f"),
         encoding="utf-8",
     )
     print(f"Saved {table_path}")
 
-    per_run_table_path = args.folder / "per_run_satisfaction.txt"
+    per_run_table_path = folder / "per_run_satisfaction.txt"
     per_run_table_path.write_text(
         run_means_df.to_latex(
             float_format="%.3f",
@@ -207,6 +204,119 @@ def main():
         encoding="utf-8",
     )
     print(f"Saved {per_run_table_path}")
+
+    return u_rear_df
+
+
+def holm(p_values):
+    """Holm-Bonferroni adjusted p-values (controls family-wise error rate)."""
+    p = np.asarray(p_values, dtype=float)
+    m = len(p)
+    order = np.argsort(p)
+    adjusted = np.empty(m)
+    running_max = 0.0
+    for rank, idx in enumerate(order):
+        running_max = max(running_max, (m - rank) * p[idx])
+        adjusted[idx] = min(1.0, running_max)
+    return adjusted
+
+
+def mann_whitney_vs_target(u_per_folder, target, req_name):
+    """One-sided Mann-Whitney U: is the target's per-run U stochastically greater than each other folder's?"""
+    x = u_per_folder[target][req_name].dropna().to_numpy()
+    rows = {}
+    for name, df in u_per_folder.items():
+        if name == target:
+            continue
+        y = df[req_name].dropna().to_numpy()
+        if len(x) == 0 or len(y) == 0:
+            stat, p, r = np.nan, np.nan, np.nan
+        else:
+            # method="auto" -> exact distribution for small samples without ties
+            stat, p = mannwhitneyu(x, y, alternative="greater")
+            # Rank-biserial correlation: +1 means every target run beats every other run
+            r = 2 * stat / (len(x) * len(y)) - 1
+        rows[name] = {
+            "n target": len(x),
+            "n other": len(y),
+            "Mean target": np.mean(x) if len(x) else np.nan,
+            "Mean other": np.mean(y) if len(y) else np.nan,
+            "Median target": np.median(x) if len(x) else np.nan,
+            "Median other": np.median(y) if len(y) else np.nan,
+            "MWU statistic": stat,
+            "p (one-sided)": p,
+            "r (rank-biserial)": r,
+        }
+    results_df = pd.DataFrame.from_dict(rows, orient="index").rename_axis(f"{target} vs")
+    valid = results_df["p (one-sided)"].notna()
+    results_df["p (Holm)"] = np.nan
+    if valid.any():
+        results_df.loc[valid, "p (Holm)"] = holm(results_df.loc[valid, "p (one-sided)"])
+    return results_df
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Plot the requirements topics from each bag directory in one or more folders, "
+                    "and test whether the target folder's per-run U is greater than the others'."
+    )
+    parser.add_argument("folders", type=Path, nargs="+",
+                        help="Folder(s) containing timestamp-named bag directories")
+    parser.add_argument("--target", type=Path, default=None,
+                        help="Folder whose U is tested to be greater than the others "
+                             "(default: first folder)")
+    parser.add_argument("--title", default=None,
+                        help="Plot title (default: prompt once per folder)")
+    parser.add_argument("--output", type=Path, default=None,
+                        help="Path for the LaTeX Mann-Whitney table "
+                             "(default: <target>/mann_whitney_u.txt)")
+    parser.add_argument(
+        "--cmd-vel-tolerance",
+        type=float,
+        default=0.02,
+        help="Absolute component threshold for treating /cmd_vel as nonzero (default: 0.02)",
+    )
+    args = parser.parse_args()
+
+    for folder in args.folders:
+        if not folder.is_dir():
+            parser.error(f"not a folder: {folder}")
+    if args.cmd_vel_tolerance < 0:
+        parser.error("--cmd-vel-tolerance must be non-negative")
+
+    target = args.target if args.target is not None else args.folders[0]
+    if target.resolve() not in [f.resolve() for f in args.folders]:
+        args.folders.insert(0, target)
+    if not target.is_dir():
+        parser.error(f"not a folder: {target}")
+
+    req_names = ["SafeRearMovement"]
+
+    # Keyed by folder name for readable table rows
+    u_per_folder = {}
+    for folder in args.folders:
+        title = args.title if args.title is not None else input(
+            f"What title should the plots in {folder.name} have? > "
+        )
+        u_per_folder[folder.name] = process_folder(
+            folder, req_names, title, args.cmd_vel_tolerance
+        )
+
+    if len(u_per_folder) < 2:
+        print("Only one folder given: skipping Mann-Whitney U test.")
+        return
+
+    results_df = mann_whitney_vs_target(u_per_folder, target.name, "SafeRearMovement")
+    print()
+    print(f"One-sided Mann-Whitney U on per-run U (alternative: {target.name} > other)")
+    print(results_df.to_string(float_format=lambda v: f"{v:.4f}"))
+
+    output = args.output if args.output is not None else target / "mann_whitney_u.txt"
+    output.write_text(
+        results_df.to_latex(float_format="%.3f", na_rep="--"),
+        encoding="utf-8",
+    )
+    print(f"Saved {output}")
 
 
 if __name__ == "__main__":
