@@ -1,0 +1,5 @@
+# The image installs dependencies; datasets are bind-mounted at runtime.
+.git
+results
+.venv
+**/__pycache__

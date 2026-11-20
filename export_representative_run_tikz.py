@@ -15,6 +15,7 @@
 
 import argparse
 import csv
+from dataclasses import dataclass
 import json
 from pathlib import Path
 import shutil
@@ -23,22 +24,39 @@ import subprocess
 import numpy as np  # noqa: I100,I201
 import yaml  # noqa: I100,I201
 
-import export_search_footprint_alternatives as footprint  # noqa: I100,I201
-import plot_requirement_fulfillment as fulfillment_plots  # noqa: I100,I201
-from diagnostic_msgs.msg import DiagnosticArray  # noqa: I100,I201
-from lifecycle_msgs.msg import TransitionEvent  # noqa: I100,I201
-from rcl_interfaces.msg import ParameterEvent  # noqa: I100,I201
-from rclpy.serialization import deserialize_message  # noqa: I100,I201
-from rosbag2_py import ConverterOptions  # noqa: I100,I201
-from rosbag2_py import SequentialReader  # noqa: I100,I201
-from rosbag2_py import StorageFilter  # noqa: I100,I201
-from rosbag2_py import StorageOptions  # noqa: I100,I201
-from std_msgs.msg import Bool  # noqa: I100,I201
-from suave_requirements.requirement_monitor import (  # noqa: I100,I201
-    get_diagnostic_value, REACTION_TIME, SEARCH_FOOTPRINT,
-    THRUSTER_AVAILABILITY)
-from suave_tools.layout import batch_layout  # noqa: I100,I201
-from suave_tools.labels import label  # noqa: I100,I201
+from rosbags.rosbag2 import Reader
+from rosbags.typesys import get_typestore, Stores
+
+
+# Recorded SUAVE conventions; no SUAVE or generated ROS packages are needed.
+THRUSTER_AVAILABILITY = 'thruster_availability'
+SEARCH_FOOTPRINT = 'search_footprint'
+REACTION_TIME = 'adaptation_reaction_time'
+REQUIREMENTS = {
+    THRUSTER_AVAILABILITY: {
+        'topic': '/requirements/thruster_availability/fulfillment',
+        'label': 'Thruster availability',
+    },
+    SEARCH_FOOTPRINT: {
+        'topic': '/requirements/search_footprint/fulfillment',
+        'label': 'Search footprint',
+    },
+    REACTION_TIME: {
+        'topic': '/requirements/adaptation_reaction_time/fulfillment',
+        'label': 'Adaptation reaction time',
+    },
+}
+# Retain the upstream reader's per-type invalid-sample counters in manifests.
+for reaction_type in ('thruster', 'water_visibility', 'battery'):
+    REQUIREMENTS[reaction_type + '_reaction_time'] = {
+        'topic': f'/requirements/adaptation_reaction_time/{reaction_type}/fulfillment',
+    }
+MANAGER_LABELS = {
+    'rebetmc': 'TacticalRetreat', 'tactical_retreat': 'TacticalRetreat',
+    'rosa_bt': 'ROSA-BT', 'bt': 'BT', 'metacontrol': 'Metacontrol',
+    'planta': 'PLANTA', 'random': 'Random', 'none': 'None',
+}
+TYPESTORE = get_typestore(Stores.ROS2_JAZZY)
 
 
 DEFAULT_PRECISION = 6
@@ -65,12 +83,12 @@ ALTITUDE_PARAMETER = 'spiral_altitude'
 MAINTAIN_MOTION_TOPIC = '/f_maintain_motion_node/transition_event'
 SEARCH_PATH_TOPIC = '/f_generate_search_path_node/transition_event'
 EVENT_TOPICS = {
-    '/diagnostics': DiagnosticArray,
-    '/parameter_events': ParameterEvent,
-    MAINTAIN_MOTION_TOPIC: TransitionEvent,
-    SEARCH_PATH_TOPIC: TransitionEvent,
-    '/pipeline/detected': Bool,
-    '/mission_metrics/done': Bool,
+    '/diagnostics': 'diagnostic_msgs/msg/DiagnosticArray',
+    '/parameter_events': 'rcl_interfaces/msg/ParameterEvent',
+    MAINTAIN_MOTION_TOPIC: 'lifecycle_msgs/msg/TransitionEvent',
+    SEARCH_PATH_TOPIC: 'lifecycle_msgs/msg/TransitionEvent',
+    '/pipeline/detected': 'std_msgs/msg/Bool',
+    '/mission_metrics/done': 'std_msgs/msg/Bool',
 }
 FIGURE = 'representative_run.tex'
 FIGURE_NO_WATER_VISIBILITY = 'representative_run_no_water_visibility.tex'
@@ -86,12 +104,172 @@ INTERVAL_LABELS = {
 }
 
 
+@dataclass
+class BatchLayout:
+    """Input campaigns and the conventional output root."""
+
+    root: Path
+    campaigns: list
+    results_root: Path
+
+
+def batch_layout(path):
+    """Accept a batch, campaigns directory, campaign, or state.json."""
+    path = Path(path).expanduser().resolve()
+    if not path.exists():
+        raise ValueError(f'not found: {path}')
+    campaigns = None
+    if path.is_file():
+        if path.name != 'state.json':
+            raise ValueError(f'Expected state.json: {path}')
+        root = path.parent
+    elif (path / 'runs.json').is_file():
+        root = path.parent.parent if path.parent.name == 'campaigns' else path.parent
+        campaigns = [path]
+    elif (path / 'campaigns').is_dir() or (path / 'state.json').is_file():
+        root = path
+    elif path.name == 'campaigns':
+        root = path.parent
+    else:
+        raise ValueError(f'Expected a batch, campaigns directory, or campaign: {path}')
+    if campaigns is None:
+        manifest = root / 'state.json'
+        if manifest.is_file():
+            state = json.loads(manifest.read_text(encoding='utf-8'))
+            if not isinstance(state, dict) or state.get('schema_version') != 2:
+                raise ValueError(f'Unsupported state-file schema: {manifest}')
+        folder = root / 'campaigns'
+        campaigns = sorted(
+            child for child in folder.iterdir()
+            if (child / 'runs.json').is_file()
+        ) if folder.is_dir() else []
+    return BatchLayout(root, campaigns, root / 'campaign_results')
+
+
+def accepted_entries(campaign, manager):
+    """Select completed accepted bags in numeric run order, never by glob."""
+    campaign = Path(campaign).resolve()
+    path = campaign / 'runs.json'
+    data = json.loads(path.read_text(encoding='utf-8'))
+    if not isinstance(data, dict) or data.get('schema_version') != 2:
+        raise ValueError(f'Unsupported runs schema: {path}')
+    if not isinstance(data.get('runs'), dict):
+        raise ValueError(f'Invalid runs file: {path}')
+
+    def run_order(run_id):
+        parts = run_id.split('_')
+        if len(parts) != 3 or parts[0] != 'run' or not all(
+                part.isdigit() for part in parts[1:]):
+            raise ValueError(f'Invalid run id: {run_id!r}')
+        return int(parts[1]), int(parts[2])
+
+    selected = []
+    for run_id in sorted(data['runs'], key=run_order):
+        entry = data['runs'][run_id]
+        if entry['status'] != 'completed' or entry['bag'] is None:
+            continue
+        if entry['bag'] != 'accepted':
+            raise ValueError(f'Completed run without accepted bag: {run_id}')
+        relative = (f'rosbags/{entry["adaptation_manager"]}_{entry["mission_name"]}_'
+                    f'{run_id}_{entry["attempt_id"]}')
+        bag = (campaign / relative).resolve()
+        if not bag.is_relative_to(campaign) or bag == campaign:
+            raise ValueError(f'Artifact escapes campaign: {relative}')
+        if not (bag / 'metadata.yaml').is_file():
+            raise ValueError(f'Missing accepted recording metadata: {bag}')
+        if entry['adaptation_manager'] == manager:
+            selected.append({
+                'run_id': run_id, 'attempt_id': entry['attempt_id'],
+                'adaptation_manager': manager,
+                'bag_path': str(bag.relative_to(campaign)),
+            })
+    return selected
+
+
+def metadata_info(bag_dir):
+    """Use recorded metadata exactly, including its duration convention."""
+    return yaml.safe_load((Path(bag_dir) / 'metadata.yaml').read_text(
+        encoding='utf-8'))['rosbag2_bagfile_information']
+
+
+def read_messages(bag_dir, topics):
+    """Yield selected standard messages in recording-time order, without ROS.
+
+    Use a fixed standard type store rather than registering every bag schema:
+    unrelated camera and custom SUAVE messages must not need deserialization.
+    """
+    with Reader(Path(bag_dir)) as reader:
+        connections = [c for c in reader.connections if c.topic in topics]
+        if not connections:
+            return
+        for connection in connections:
+            if connection.msgtype != topics[connection.topic]:
+                raise ValueError(f'Unexpected type for {connection.topic}: '
+                                 f'{connection.msgtype}')
+        for connection, timestamp, raw in reader.messages(connections=connections):
+            yield (connection.topic, timestamp,
+                   TYPESTORE.deserialize_cdr(raw, connection.msgtype))
+
+
+def read_bag(entry, campaign):
+    """Read recorded fulfillment values, retaining upstream sample filtering."""
+    bag_dir = Path(campaign) / entry['bag_path']
+    info = metadata_info(bag_dir)
+    start_ns = int(info['starting_time']['nanoseconds_since_epoch'])
+    duration_ns = int(info['duration']['nanoseconds'])
+    if duration_ns <= 0:
+        raise ValueError(f'Invalid duration for {bag_dir}')
+    series = {key: {'times_ns': [], 'values': []} for key in REQUIREMENTS}
+    invalid = {key: 0 for key in REQUIREMENTS}
+    keys = {spec['topic']: key for key, spec in REQUIREMENTS.items()}
+    topics = {topic: 'std_msgs/msg/Float32' for topic in keys}
+    for topic, timestamp, msg in read_messages(bag_dir, topics):
+        key = keys[topic]
+        value = float(msg.data)
+        if not np.isfinite(value) or value < -1.0e-6 or value > 1.0 + 1.0e-6:
+            invalid[key] += 1
+            continue
+        series[key]['times_ns'].append(int(timestamp) - start_ns)
+        series[key]['values'].append(float(np.clip(value, 0.0, 1.0)))
+    return {**entry, 'bag_dir': str(bag_dir), 'duration_ns': duration_ns,
+            'series': series, 'invalid_samples': invalid}
+
+
+def get_diagnostic_value(msg, key):
+    """Return the last numeric diagnostic value matching key."""
+    value = None
+    for status in msg.status:
+        for item in status.values:
+            if item.key == key:
+                try:
+                    value = float(item.value)
+                except ValueError:
+                    continue
+    return value
+
+
+def bool_value(value):
+    """Interpret a metrics CSV boolean."""
+    return str(value).strip().lower() in ('1', 'true', 'yes')
+
+
+def write_rows(path, header, rows, precision=DEFAULT_PRECISION):
+    """Write whitespace-delimited PGFPlots data, matching upstream formatting."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [' '.join(header)]
+    for row in rows:
+        lines.append(' '.join(
+            f'{row[key]:.{precision}f}' if isinstance(row[key], float)
+            else str(row[key]) for key in header))
+    path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+
+
 def parse_args(argv=None):
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
         description=('Export the requirement fulfillment, adaptations and '
                      'context of one representative SUAVE run as PGFPlots '
-                     'data tables. Run it in the sourced SUAVE container.'))
+                     'data tables. No ROS installation is required.'))
     parser.add_argument(
         'path',
         help='Batch, campaigns directory, state.json, or campaign folder.')
@@ -142,8 +320,8 @@ def float_or_nan(value):
 
 def load_candidates(campaign, manager):
     """Return the manager's accepted runs joined with their metrics rows."""
-    selected, _ = fulfillment_plots.accepted_entries(campaign, [manager])
-    path = footprint.manager_csv(campaign, manager)
+    selected = accepted_entries(campaign, manager)
+    path = Path(campaign) / f'{manager}_suave.csv'
     rows = {}
     if path.is_file():
         with path.open(newline='', encoding='utf-8') as handle:
@@ -151,7 +329,7 @@ def load_candidates(campaign, manager):
     candidates = []
     for entry in selected:
         row = rows.get(entry['attempt_id'])
-        if row is None or not footprint.bool_value(row.get('pipeline found')):
+        if row is None or not bool_value(row.get('pipeline found')):
             continue
         candidates.append({
             **entry,
@@ -201,16 +379,7 @@ def read_events(bag_dir, start_ns):
         'pipeline_detected': None,
         'mission_done': None,
     }
-    reader = SequentialReader()
-    reader.open(StorageOptions(uri=str(bag_dir), storage_id='mcap'),
-                ConverterOptions('', ''))
-    reader.set_filter(StorageFilter(topics=list(EVENT_TOPICS)))
-    while reader.has_next():
-        topic, data, timestamp = reader.read_next()
-        msg_type = EVENT_TOPICS.get(topic)
-        if msg_type is None:
-            continue
-        msg = deserialize_message(data, msg_type)
+    for topic, timestamp, msg in read_messages(bag_dir, EVENT_TOPICS):
         t = (int(timestamp) - start_ns) * 1e-9
         if topic == '/diagnostics':
             for key in ('water_visibility', 'operational_thrusters'):
@@ -358,10 +527,10 @@ def write_tables(output_dir, record, events, adaptation_list, intervals,
         if key in SEARCH_ONLY_REQUIREMENTS:
             rows = censor_rows(rows, detected)
         path = data_dir / f'{key}.dat'
-        footprint.write_rows(path, ['time', 'value'], rows, precision)
+        write_rows(path, ['time', 'value'], rows, precision)
         files[key] = path.relative_to(output_dir).as_posix()
     path = data_dir / 'water_visibility.dat'
-    footprint.write_rows(
+    write_rows(
         path, ['time', 'value'],
         censor_rows(start_rows_at_zero(
             [{'time': t, 'value': v}
@@ -369,11 +538,11 @@ def write_tables(output_dir, record, events, adaptation_list, intervals,
         precision)
     files['water_visibility'] = path.relative_to(output_dir).as_posix()
     path = data_dir / 'adaptations.dat'
-    footprint.write_rows(path, ['index', 'time', 'kind', 'detail'],
+    write_rows(path, ['index', 'time', 'kind', 'detail'],
                          adaptation_list, precision)
     files['adaptations'] = path.relative_to(output_dir).as_posix()
     path = data_dir / 'intervals.dat'
-    footprint.write_rows(path, ['start', 'end', 'kind'], intervals, precision)
+    write_rows(path, ['start', 'end', 'kind'], intervals, precision)
     files['intervals'] = path.relative_to(output_dir).as_posix()
     return files
 
@@ -426,7 +595,7 @@ def preview_tex(files, requirements, adaptation_list, intervals, thresholds,
             rf'(axis cs:{interval["start"]:.3f},{ymin}) rectangle '
             rf'(axis cs:{interval["end"]:.3f},{ymax});')
     for key in requirements:
-        spec = fulfillment_plots.REQUIREMENTS[key]
+        spec = REQUIREMENTS[key]
         lines.append(
             rf'\addplot[const plot, very thick, '
             rf'color=req{key.replace("_", "")}] '
@@ -526,8 +695,8 @@ def export_campaign(campaign, output_root, args):
               ' '.join(f'{key}={candidate[key]:.2f}'
                        for key in SELECTION_METRICS))
     print(f'Exporting {chosen["run_id"]}')
-    record = fulfillment_plots.read_bag(chosen, campaign)
-    info = fulfillment_plots.metadata_info(Path(record['bag_dir']))
+    record = read_bag(chosen, campaign)
+    info = metadata_info(Path(record['bag_dir']))
     start_ns = int(info['starting_time']['nanoseconds_since_epoch'])
     duration_s = record['duration_ns'] * 1e-9
     events = read_events(record['bag_dir'], start_ns)
@@ -548,7 +717,7 @@ def export_campaign(campaign, output_root, args):
     tex_name = FIGURE if args.water_visibility else FIGURE_NO_WATER_VISIBILITY
     (output_dir / tex_name).write_text(
         preview_tex(files, args.requirements, adaptation_list, intervals,
-                    thresholds, xmax, label(args.manager),
+                    thresholds, xmax, MANAGER_LABELS.get(args.manager, args.manager),
                     args.water_visibility),
         encoding='utf-8')
     (output_dir / 'caption.tex').write_text(

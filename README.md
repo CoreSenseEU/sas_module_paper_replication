@@ -1,6 +1,45 @@
 # Tactical Retreat Replication Package
 This is a replication package to refer to the data and plots for the tactical retreat paper.
 
+## Getting the data (Git LFS)
+
+`results/suave-tactical-submission.zip` is stored with [Git LFS](https://git-lfs.com).
+Without Git LFS, cloning still works but that file is only a small text pointer, not the actual zip.
+Install Git LFS before cloning:
+
+```Bash
+git lfs install
+git clone git@github.com:CoreSenseEU/sas_module_paper_replication.git
+```
+
+If you already cloned without it, run `git lfs install && git lfs pull` inside the repository.
+Alternatively, download the zip directly from the GitHub web interface.
+
+## Setup
+
+Use Python 3.10 or newer. From the repository directory:
+
+```Bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements
+```
+
+Alternatively, rebuild/reopen the development container in VS Code to install
+the dependencies for all plotting scripts.
+
+To build and run the container directly, from the repository directory:
+
+```Bash
+docker build -t sas_replication:latest -f .devcontainer/Dockerfile .
+docker run --rm -it --user "$(id -u):$(id -g)" \
+  -v "$PWD:/workspace" -w /workspace sas_replication:latest bash
+```
+
+Run the plotting commands below inside the container.
+
+## Quality Inspection Testbed - Real World Evaluation
+
 There are two python scripts, plot.py and plot_cbr.py.
 These are both for the quality inspection testbed portion of the evaluation.
 plot.py is for the 'demo' scenario where the robot travels between workcells, referred to as eval1 in the results.
@@ -14,51 +53,70 @@ You would plot the results of the baseline for eval1 as follows:
 python3 plot.py 
 ```
 
-## SUAVE - Plot Representative run
+## SUAVE - Simulated Evaluation
 
-`export_representative_run_tikz.py` exports one run of one manager
-(default `rebetmc`) as PGFPlots tables: the requirement fulfillment
-(`--requirements`, default thruster availability and search footprint; the
-combined reaction time is also available), the water visibility, the
-adaptations, and the mission-phase and thruster-failure intervals. It also
-writes a standalone `representative_run.tex` figure, a `caption.tex` sentence
-listing the numbered adaptations, and a `manifest.json`.
+[SUAVE](https://github.com/kas-lab/suave) is a ROS 2 exemplar in which an
+underwater vehicle searches for and inspects a pipeline while thrusters fail
+and water visibility changes. The data come from one campaign that
+compares `TacticalRetreat` with SUAVE's other managing systems.
+
+### Data
+
+`results/suave-tactical-submission.zip` holds batch `batch_20261012_192250`:
+
+| Path in the batch | Contents |
+|---|---|
+| `campaigns/exp3/rosbags/` | One ROS bag per run |
+| `campaigns/exp3/<manager>_suave.csv` | Per-run mission metrics for each manager |
+| `campaigns/exp3/*_reaction_time.csv`, `*_recovery_time.csv` | Reaction and recovery times |
+| `campaigns/exp3/mission_config_run<N>.yaml`, `runs.json` | Mission configuration of each run |
+| `campaign_results/exp3/requirement_fulfillment/` | Fulfillment of each requirement over time, compared across managers |
+| `campaign_results/exp3/representative_run/rebetmc_run_0_9/` | Representative `TacticalRetreat` run: PGFPlots tables, `representative_run.tex` and `.pdf` |
+
+From this repository directory, extract the data with:
 
 ```Bash
-B=~/suave/results/batches/<batch>
-python3 src/suave/suave_requirements/scripts/export_representative_run_tikz.py $B
-python3 src/suave/suave_requirements/scripts/export_representative_run_tikz.py \
-  $B --run-id run_0_24 --xmax 150 --compile
+unzip results/suave-tactical-submission.zip -d results/suave/
 ```
 
-Output goes to
-`<batch>/campaign_results/<campaign>/representative_run/<manager>_<run_id>/`
-(or `--output-dir DIR/<campaign>/<manager>_<run_id>/`). `--xmax` ends the
-figure's x axis at that mission time (the tables keep the whole run).
-`--no-water-visibility` leaves out the water-visibility panel and writes
-`representative_run_no_water_visibility.tex` instead, so both versions can
-sit side by side.
-`--compile` runs `pdflatex` on the figure when it is installed.
+The plots and tables used in the paper are already in `campaign_results/`, so
+the steps below are only needed to regenerate them.
 
-- **Run selection:** among accepted runs that found the pipeline, the run
-  minimizing the summed `|value - median| / SD` of search time, distance
-  inspected and mean reaction time (from `<manager>_suave.csv`, joined by
-  `attempt_id`). The ranking is printed and kept in `manifest.json`;
-  `--run-id` overrides it.
-- **Time:** mission time, in seconds since the first activation of
-  `f_generate_search_path`, used by every table. Values recorded before it
-  are held at zero.
-- **Search-only series:** search footprint and water visibility end at the
-  first `/pipeline/detected` true, holding their last value up to it.
-- **Adaptations** are actuation times: `spiral_altitude` changes of
-  `/f_generate_search_path_node` on `/parameter_events` (the startup
-  declaration is ignored) and manager activations/deactivations on
-  `/f_maintain_motion_node/transition_event`.
-- **Intervals:** searching runs from the first activation of
-  `f_generate_search_path` to the first `/pipeline/detected` true,
-  inspecting from there to `/mission_metrics/done` (or bag end), and thruster
-  failure while `operational_thrusters` is below `--required-thrusters`
-  (default `6`).
-- **Water-visibility thresholds** come from the run's mission config and are
-  labelled with their `expected_altitude`: visibility at or above a threshold
-  expects that search altitude.
+### Regenerating the representative-run figure
+
+`export_representative_run_tikz.py` runs without ROS or SUAVE packages:
+
+```Bash
+python3 export_representative_run_tikz.py \
+  results/suave/batch_20261012_192250 \
+  --output-dir results/suave/regenerated
+```
+
+`export_representative_run_tikz.py` picks the run closest to the median of
+search time, distance inspected and mean reaction time, which is `run_0_9`
+for this batch. `--run-id` chooses another run. `--xmax` shortens the
+figure's x axis and `--no-water-visibility` leaves out the water-visibility
+panel. Outputs go to
+`results/suave/regenerated/exp3/rebetmc_run_0_9/` with the command above.
+Without `--output-dir`, they go to the batch's
+`campaign_results/exp3/representative_run/rebetmc_run_0_9/`, replacing files
+with the same names. Pass `--help` instead of the batch path to see all of
+a script's options.
+
+### Compiling the figures
+
+The previous command, only generates `.tex` files. To actually generate a `.pdf` with the figure, you need to install latex and some latex utils.
+
+In ubuntu/debian:
+
+```bash
+sudo apt install texlive-latex-extra texlive-pictures poppler-utils
+```
+
+With these dependencies installed, you can compile the `.tex` files and generate a PDF by passing the `--compile` flag:
+
+```Bash
+python3 export_representative_run_tikz.py  --compile \
+  results/suave/batch_20261012_192250 \
+  --output-dir results/suave/regenerated
+```
